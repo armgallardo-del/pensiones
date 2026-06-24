@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudio de Pensión IMSS — Consultoría de Pensiones · Aguascalientes</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 10pt;
+    color: #1a1a2e;
+    background: #f0f2f5;
+    padding: 10px;
+  }
+
+  /* ===== PAGE WRAPPER ===== */
+  .page {
+    width: 215.9mm;
+    min-height: 279.4mm;
+    background: #fff;
+    margin: 0 auto;
+    padding: 12mm 14mm 14mm 14mm;
+    box-shadow: 0 2px 20px rgba(0,0,0,.15);
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 3px solid #1a4e8c;
+    padding-bottom: 7px;
+    margin-bottom: 10px;
+  }
+  .header-left h1 { font-size: 14pt; color: #1a4e8c; font-weight: 700; }
+  .header-left .subtitle { font-size: 8pt; color: #555; margin-top: 2px; }
+  .badge { background: #1a4e8c; color: #fff; font-size: 7.5pt; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
+  .folio-box { border: 1px solid #bbb; border-radius: 5px; padding: 3px 8px; margin-top: 5px; font-size: 8pt; color: #444; text-align: center; }
+
+  /* ===== SECTION HEADERS ===== */
+  .sec-header {
+    color: #fff; font-size: 8pt; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; padding: 4px 9px; border-radius: 4px;
+    margin: 9px 0 5px 0; display: flex; align-items: center; gap: 6px;
+    background: #1a4e8c;
+  }
+  .sec-header.green  { background: #1a7a4a; }
+  .sec-header.orange { background: #c06000; }
+  .sec-header.red    { background: #8c2020; }
+  .sec-header.purple { background: #4a1a8c; }
+  .sec-header.teal   { background: #0d6e74; }
+
+  /* ===== GRID ===== */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px 10px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 5px 8px; }
+  .span2 { grid-column: span 2; }
+  .span3 { grid-column: span 3; }
+  .span4 { grid-column: span 4; }
+
+  /* ===== FIELDS ===== */
+  .field { display: flex; flex-direction: column; margin-bottom: 3px; }
+  .field label { font-size: 7pt; color: #555; font-weight: 600; margin-bottom: 1px; text-transform: uppercase; letter-spacing: .3px; }
+  .field input[type="text"],
+  .field input[type="number"],
+  .field select,
+  .field textarea {
+    border: none; border-bottom: 1.5px solid #aac0de; background: transparent;
+    font-size: 9pt; color: #1a1a2e; padding: 2px 2px 1px 2px;
+    outline: none; width: 100%; font-family: inherit; transition: border-color .2s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-bottom-color: #1a4e8c; background: #f5f8ff; }
+  .field textarea { resize: vertical; min-height: 36px; border: 1.5px solid #aac0de; border-radius: 3px; padding: 4px; }
+
+  /* ===== RADIO / CHECKBOX ===== */
+  .radio-group, .check-group { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin: 2px 0; }
+  .radio-group label, .check-group label {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 8.5pt; color: #1a1a2e; cursor: pointer;
+    font-weight: 400; text-transform: none; letter-spacing: 0;
+  }
+  .radio-group input, .check-group input { accent-color: #1a4e8c; width: 13px; height: 13px; }
+
+  /* ===== SEMANAS TABLE ===== */
+  .semanas-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-top: 4px; }
+  .semanas-table th {
+    background: #e8eef8; color: #1a4e8c; font-size: 7.5pt; font-weight: 700;
+    padding: 4px 6px; border: 1px solid #c5d4ea; text-align: left;
+    text-transform: uppercase; letter-spacing: .3px;
+  }
+  .semanas-table td { padding: 3px 6px; border: 1px solid #dde5f0; vertical-align: middle; }
+  .semanas-table tr:nth-child(even) td { background: #f8faff; }
+  .semanas-table td input[type="text"] {
+    width: 100%; border: none; background: transparent; font-size: 8.5pt;
+    font-family: inherit; color: #1a1a2e; outline: none;
+  }
+  .semanas-table td input[type="text"]:focus { background: #eef3ff; }
+  .tag { display: inline-block; padding: 1px 6px; border-radius: 10px; font-size: 7pt; font-weight: 700; white-space: nowrap; }
+  .tag-recover { background: #d4edda; color: #155724; }
+  .tag-verify  { background: #fff3cd; color: #856404; }
+  .tag-auto    { background: #d1ecf1; color: #0c5460; }
+
+  /* ===== DIAG PANEL ===== */
+  .diag-panel { border: 2px solid #1a7a4a; border-radius: 6px; padding: 8px 10px; margin-top: 6px; background: #f6fff9; }
+  .diag-panel .diag-title { font-size: 8pt; font-weight: 700; color: #1a7a4a; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 16px; }
+  .diag-box { border: 1.5px solid #a8d5b8; border-radius: 5px; padding: 5px 8px; background: #fff; }
+  .diag-box.blue { border-color: #aac0de; background: #f5f8ff; }
+  .diag-box label { font-size: 7pt; color: #555; font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .diag-box input[type="text"] { border: none; border-bottom: 1px solid #c5d4ea; width: 100%; font-size: 9pt; background: transparent; outline: none; font-family: inherit; }
+
+  /* ===== PASOS ===== */
+  .pasos-list { list-style: none; margin-top: 4px; }
+  .pasos-list li { display: flex; align-items: flex-start; gap: 7px; padding: 3px 0; border-bottom: 1px dashed #e0e6f0; font-size: 8.5pt; }
+  .pasos-list li:last-child { border-bottom: none; }
+  .pasos-list input[type="checkbox"] { accent-color: #1a4e8c; margin-top: 2px; flex-shrink: 0; }
+
+  /* ===== FIRMAS ===== */
+  .firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 12px; padding-top: 8px; border-top: 1.5px solid #dde5f0; }
+  .firma-box { text-align: center; }
+  .firma-line { border-top: 1.5px solid #666; margin-top: 28px; padding-top: 3px; font-size: 7.5pt; color: #444; }
+
+  /* ===== ALERT ===== */
+  .alert { border-left: 4px solid #c06000; background: #fff8f0; padding: 4px 8px; border-radius: 0 4px 4px 0; font-size: 7.5pt; color: #6b3500; margin: 4px 0; line-height: 1.4; }
+  .alert.blue { border-color: #1a4e8c; background: #f0f5ff; color: #1a4e8c; }
+
+  /* ===== ACTION BAR ===== */
+  .action-bar {
+    display: flex; gap: 10px; justify-content: center;
+    margin-bottom: 14px; flex-wrap: wrap;
+    background: #1a4e8c; padding: 12px 20px; border-radius: 10px;
+    width: 215.9mm; margin-left: auto; margin-right: auto;
+  }
+  .action-bar .site-name { color: #fff; font-size: 10pt; font-weight: 700; flex: 1; display: flex; align-items: center; }
+  .btn { padding: 8px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 9pt; font-weight: 600; font-family: inherit; transition: opacity .2s; }
+  .btn:hover { opacity: .85; }
+  .btn-print  { background: #fff; color: #1a4e8c; }
+  .btn-send   { background: #1a7a4a; color: #fff; }
+  .btn-reset  { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5);
+    z-index: 1000; align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: #fff; border-radius: 12px; padding: 28px 32px;
+    max-width: 420px; width: 90%; text-align: center;
+    box-shadow: 0 8px 40px rgba(0,0,0,.25);
+  }
+  .modal h2 { color: #1a4e8c; font-size: 13pt; margin-bottom: 10px; }
+  .modal p  { font-size: 9pt; color: #444; line-height: 1.6; margin-bottom: 14px; }
+  .modal .btn-send  { width: 100%; padding: 11px; font-size: 10pt; margin-bottom: 8px; }
+  .modal .btn-cancel { background: #eee; color: #555; width: 100%; padding: 9px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; font-size: 9pt; }
+  .modal .spinner { display: none; margin: 12px auto; width: 28px; height: 28px; border: 3px solid #dde; border-top-color: #1a4e8c; border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .modal .success { display: none; color: #1a7a4a; font-size: 11pt; font-weight: 700; margin: 10px 0; }
+  .modal .error-msg { display: none; color: #8c2020; font-size: 9pt; margin: 8px 0; }
+
+  .divider { border: none; border-top: 1px solid #e0e8f5; margin: 6px 0; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .page { box-shadow: none; padding: 8mm 12mm; width: 100%; }
+    .action-bar { display: none !important; }
+    .modal-overlay { display: none !important; }
+    @page { margin: 0; size: letter; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BARRA DE ACCIONES -->
+<div class="action-bar">
+  <div class="site-name">📋 Consultoría de Pensiones · Aguascalientes</div>
+  <button class="btn btn-send" onclick="abrirModal()">📤 Enviar al consultor</button>
+  <button class="btn btn-print" onclick="window.print()">🖨️ Imprimir / PDF</button>
+  <button class="btn btn-reset" onclick="limpiarFormulario()">🔄 Limpiar</button>
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN Y ENVÍO -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>📤 Enviar Diagnóstico</h2>
+    <p>Se enviará el diagnóstico capturado al consultor <strong>C.P. Armando Gallardo Terán</strong>.<br>Por favor confirme el nombre del cliente antes de enviar.</p>
+    <div style="text-align:left; margin-bottom:14px;">
+      <label style="font-size:8pt; color:#555; font-weight:700; display:block; margin-bottom:4px;">NOMBRE DEL CLIENTE (confirmación)</label>
+      <input type="text" id="confirmNombre" placeholder="Escriba el nombre completo" style="width:100%; border:1.5px solid #aac0de; border-radius:5px; padding:7px 10px; font-size:9.5pt; font-family:inherit; outline:none;">
+    </div>
+    <button class="btn btn-send" onclick="enviarFormulario()">✅ Confirmar y enviar</button>
+    <div class="spinner" id="spinner"></div>
+    <div class="success" id="successMsg">✅ ¡Diagnóstico enviado correctamente!</div>
+    <div class="error-msg" id="errorMsg">❌ Error al enviar. Verifique su conexión e intente de nuevo.</div>
+    <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+  </div>
+</div>
+
+<!-- FORMULARIO PRINCIPAL -->
+<div class="page" id="formulario">
+
+  <!-- ENCABEZADO -->
+  <div class="header">
+    <div class="header-left">
+      <h1>Estudio de Pensión IMSS — Ley 1973</h1>
+      <div class="subtitle">Consultoría de Pensiones · Aguascalientes &nbsp;|&nbsp; C.P. Armando Gallardo Terán</div>
+    </div>
+    <div class="header-right">
+      <div class="badge">SESIÓN INICIAL</div>
+      <div class="folio-box">Folio: <input type="text" id="folio" placeholder="____" style="width:60px; border:none; border-bottom:1px solid #aaa; font-size:8pt; outline:none;"></div>
+      <div class="folio-box" style="margin-top:3px;">Fecha: <input type="text" id="fecha" placeholder="DD/MM/AAAA" style="width:80px; border:none; border-bottom:1px solid #aaa; font-size:8pt; outline:none;"></div>
+    </div>
+  </div>
+
+  <!-- 1. DATOS DEL CLIENTE -->
+  <div class="sec-header">👤 1. Datos del Cliente</div>
+  <div class="grid-3">
+    <div class="field span2"><label>Nombre completo</label><input type="text" id="nombre" placeholder=""></div>
+    <div class="field"><label>Fecha de nacimiento</label><input type="text" id="fnac" placeholder="DD/MM/AAAA"></div>
+    <div class="field"><label>Edad actual</label><input type="number" id="edad" placeholder=""></div>
+    <div class="field"><label>NSS (Núm. de Seguridad Social)</label><input type="text" id="nss" placeholder=""></div>
+    <div class="field"><label>CURP</label><input type="text" id="curp" placeholder=""></div>
+    <div class="field"><label>Teléfono / WhatsApp</label><input type="text" id="tel" placeholder=""></div>
+    <div class="field"><label>Correo electrónico</label><input type="text" id="correo" placeholder=""></div>
+    <div class="field"><label>Ocupación actual</label><input type="text" id="ocupacion" placeholder=""></div>
+    <div class="field span2"><label>Último patrón registrado en IMSS</label><input type="text" id="patron_nombre" placeholder=""></div>
+    <div class="field"><label>Situación laboral actual</label>
+      <select id="situacion_laboral">
+        <option value="">-- Seleccionar --</option>
+        <option>Activo (trabajando)</option>
+        <option>Desempleado</option>
+        <option>Cuenta propia / independiente</option>
+        <option>Modalidad 40 activa</option>
+        <option>Jubilado otro régimen</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- 2. HISTORIAL DE COTIZACIÓN -->
+  <div class="sec-header">📋 2. Historial de Cotización IMSS</div>
+  <div class="grid-3">
+    <div class="field"><label>Fecha de alta en IMSS (1ª vez)</label><input type="text" id="fecha_alta" placeholder="DD/MM/AAAA"></div>
+    <div class="field"><label>Semanas cotizadas (constancia IMSS)</label><input type="number" id="semanas_constancia" placeholder="Ej. 1150"></div>
+    <div class="field"><label>¿Cotizó antes del 1° jul 1997?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="ley73" value="Sí (Ley 73)"> Sí (Ley 73)</label>
+        <label><input type="radio" name="ley73" value="No (Ley 97)"> No (Ley 97)</label>
+      </div>
+    </div>
+    <div class="field"><label>¿Tiene periodos sin cotizar?</label><input type="text" id="periodos_sin" placeholder="Ej. 2005–2008, 2015–2016"></div>
+    <div class="field"><label>¿Ha tenido más de un patrón?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="multipatron" value="Sí"> Sí</label>
+        <label><input type="radio" name="multipatron" value="No"> No</label>
+      </div>
+    </div>
+    <div class="field"><label>Conservación de derechos activa</label>
+      <div class="radio-group">
+        <label><input type="radio" name="conserva" value="Sí"> Sí</label>
+        <label><input type="radio" name="conserva" value="No"> No</label>
+        <label><input type="radio" name="conserva" value="Por calcular"> Por calcular</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. ANÁLISIS DE SEMANAS -->
+  <div class="sec-header orange">🔍 3. Análisis de Semanas — Tipos, Recuperación y Estrategia</div>
+  <div class="alert blue">Identifique cada tipo de semanas presentes en el historial del cliente, su estatus actual y la acción recomendada.</div>
+
+  <table class="semanas-table">
+    <thead>
+      <tr>
+        <th style="width:22%">Tipo / Origen</th>
+        <th style="width:9%">¿Aplica?</th>
+        <th style="width:12%">Semanas</th>
+        <th style="width:11%">Estatus</th>
+        <th style="width:46%">Observaciones / Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- A -->
+      <tr style="background:#eef3ff;">
+        <td colspan="5" style="font-size:7.5pt;font-weight:700;color:#1a4e8c;padding:4px 6px;border:1px solid #c5d4ea;">A) SEMANAS COTIZADAS REGULARES</td>
+      </tr>
+      <tr>
+        <td>Semanas registradas en IMSS (periodos normales con patrón)</td>
+        <td><div class="radio-group"><label><input type="radio" name="a1" value="Sí">Sí</label><label><input type="radio" name="a1" value="No">No</label></div></td>
+        <td><input type="text" id="a1_sem" placeholder=""></td>
+        <td><span class="tag tag-auto">Automático</span></td>
+        <td><input type="text" id="a1_obs" placeholder="Verificar en constancia IMSS Digital"></td>
+      </tr>
+      <tr>
+        <td>Semanas no registradas por omisión del patrón</td>
+        <td><div class="radio-group"><label><input type="radio" name="a2" value="Sí">Sí</label><label><input type="radio" name="a2" value="No">No</label></div></td>
+        <td><input type="text" id="a2_sem" placeholder=""></td>
+        <td><span class="tag tag-verify">Aclaración IMSS</span></td>
+        <td><input type="text" id="a2_obs" placeholder="Aclaración en subdelegación. Plazo: 30–90 días. Documentos: contratos, nóminas, CFDI."></td>
+      </tr>
+      <tr>
+        <td>Semanas de empleos anteriores no visibles (error afiliación / cambio NSS)</td>
+        <td><div class="radio-group"><label><input type="radio" name="a3" value="Sí">Sí</label><label><input type="radio" name="a3" value="No">No</label></div></td>
+        <td><input type="text" id="a3_sem" placeholder=""></td>
+        <td><span class="tag tag-verify">Aclaración IMSS</span></td>
+        <td><input type="text" id="a3_obs" placeholder=""></td>
+      </tr>
+      <!-- B -->
+      <tr style="background:#fff5e6;">
+        <td colspan="5" style="font-size:7.5pt;font-weight:700;color:#c06000;padding:4px 6px;border:1px solid #c5d4ea;">B) SEMANAS DESCONTADAS POR RETIROS PARCIALES DE AFORE</td>
+      </tr>
+      <tr>
+        <td>Retiro parcial por desempleo (descuenta semanas proporcionalmente)</td>
+        <td><div class="radio-group"><label><input type="radio" name="b1" value="Sí">Sí</label><label><input type="radio" name="b1" value="No">No</label></div></td>
+        <td><input type="text" id="b1_sem" placeholder=""></td>
+        <td><span class="tag tag-recover">Recuperable</span></td>
+        <td><input type="text" id="b1_obs" placeholder="Reintegrar monto a Afore. Acudir a subdelegación IMSS para reincorporar semanas."></td>
+      </tr>
+      <tr>
+        <td>Retiro parcial por matrimonio</td>
+        <td><div class="radio-group"><label><input type="radio" name="b2" value="Sí">Sí</label><label><input type="radio" name="b2" value="No">No</label></div></td>
+        <td><input type="text" id="b2_sem" placeholder=""></td>
+        <td><span class="tag tag-auto">Sin impacto</span></td>
+        <td><input type="text" id="b2_obs" placeholder="No afecta semanas. Solo se ejerce una vez en la vida."></td>
+      </tr>
+      <tr>
+        <td>Monto retirado de Afore (para calcular reintegro)</td>
+        <td colspan="2"><input type="text" id="b3_monto" placeholder="$ _______________" style="width:100%;border:none;border-bottom:1px solid #aac0de;font-size:8.5pt;font-family:inherit;outline:none;"></td>
+        <td><span class="tag tag-verify">Cuantificar</span></td>
+        <td><input type="text" id="b3_obs" placeholder="Consultar en Afore el monto actualizado a reembolsar."></td>
+      </tr>
+      <!-- C -->
+      <tr style="background:#f0f5ff;">
+        <td colspan="5" style="font-size:7.5pt;font-weight:700;color:#1a4e8c;padding:4px 6px;border:1px solid #c5d4ea;">C) SEMANAS DE ISSSTE — PORTABILIDAD (Convenio IMSS-ISSSTE)</td>
+      </tr>
+      <tr>
+        <td>Periodos cotizados ante ISSSTE (sector público)</td>
+        <td><div class="radio-group"><label><input type="radio" name="c1" value="Sí">Sí</label><label><input type="radio" name="c1" value="No">No</label></div></td>
+        <td><input type="text" id="c1_sem" placeholder=""></td>
+        <td><span class="tag tag-recover">Portabilidad</span></td>
+        <td><input type="text" id="c1_obs" placeholder="Trámite en último Instituto. ~30 días hábiles."></td>
+      </tr>
+      <tr>
+        <td>¿Última cotización en IMSS o ISSSTE?</td>
+        <td colspan="2"><div class="radio-group"><label><input type="radio" name="c2" value="IMSS">IMSS</label><label><input type="radio" name="c2" value="ISSSTE">ISSSTE</label></div></td>
+        <td><span class="tag tag-verify">Clave</span></td>
+        <td><input type="text" id="c2_obs" placeholder="Define dónde se tramita portabilidad y pensión."></td>
+      </tr>
+      <tr>
+        <td>¿Tiene Constancia de Períodos Reconocidos ISSSTE-IMSS?</td>
+        <td><div class="radio-group"><label><input type="radio" name="c3" value="Sí">Sí</label><label><input type="radio" name="c3" value="No">No</label><label><input type="radio" name="c3" value="En trámite">En trámite</label></div></td>
+        <td><input type="text" id="c3_sem" placeholder=""></td>
+        <td><span class="tag tag-verify">Requisito</span></td>
+        <td><input type="text" id="c3_obs" placeholder="Requisito previo a solicitud de pensión."></td>
+      </tr>
+      <!-- D -->
+      <tr style="background:#f0fff5;">
+        <td colspan="5" style="font-size:7.5pt;font-weight:700;color:#1a7a4a;padding:4px 6px;border:1px solid #c5d4ea;">D) MODALIDAD 40 — CONTINUACIÓN VOLUNTARIA</td>
+      </tr>
+      <tr>
+        <td>¿Está inscrito o puede inscribirse en Modalidad 40?</td>
+        <td><div class="radio-group"><label><input type="radio" name="d1" value="Sí">Sí</label><label><input type="radio" name="d1" value="No">No</label></div></td>
+        <td><input type="text" id="d1_sem" placeholder="Proyectadas"></td>
+        <td><span class="tag tag-recover">Estratégico</span></td>
+        <td><input type="text" id="d1_obs" placeholder="Acumula semanas + eleva SBC promedio últimas 250 semanas. Sin servicio médico."></td>
+      </tr>
+      <tr>
+        <td>SBC elegido para Modalidad 40</td>
+        <td colspan="2"><input type="text" id="d2_sbc" placeholder="$ ______ / semana" style="width:100%;border:none;border-bottom:1px solid #aac0de;font-size:8.5pt;font-family:inherit;outline:none;"></td>
+        <td><span class="tag tag-verify">Planear</span></td>
+        <td><input type="text" id="d2_obs" placeholder="Evaluar costo-beneficio."></td>
+      </tr>
+      <tr>
+        <td>Total semanas actuales + proyectadas Mod. 40</td>
+        <td colspan="2"><input type="text" id="d3_total" placeholder="____ + ____ = ____" style="width:100%;border:none;border-bottom:1px solid #aac0de;font-size:8.5pt;font-family:inherit;outline:none;"></td>
+        <td><span class="tag tag-auto">Proyección</span></td>
+        <td><input type="text" id="d3_obs" placeholder="Calcular fecha óptima de pensión."></td>
+      </tr>
+      <!-- E -->
+      <tr style="background:#f5f0ff;">
+        <td colspan="5" style="font-size:7.5pt;font-weight:700;color:#4a1a8c;padding:4px 6px;border:1px solid #c5d4ea;">E) MODALIDAD 10 — SEGURO FACULTATIVO</td>
+      </tr>
+      <tr>
+        <td>¿Ha cotizado o puede cotizar en Modalidad 10?</td>
+        <td><div class="radio-group"><label><input type="radio" name="e1" value="Sí">Sí</label><label><input type="radio" name="e1" value="No">No</label></div></td>
+        <td><input type="text" id="e1_sem" placeholder=""></td>
+        <td><span class="tag tag-verify">Verificar</span></td>
+        <td><input type="text" id="e1_obs" placeholder="Para independientes/desempleados. Incluye servicio médico. SBC máx. 10 UMAs."></td>
+      </tr>
+      <!-- F -->
+      <tr style="background:#fff0f0;">
+        <td colspan="5" style="font-size:7.5pt;font-weight:700;color:#8c2020;padding:4px 6px;border:1px solid #c5d4ea;">F) SAR 92 / INFONAVIT 92</td>
+      </tr>
+      <tr>
+        <td>¿Tiene saldo en SAR IMSS 92 o SAR INFONAVIT 92?</td>
+        <td><div class="radio-group"><label><input type="radio" name="f1" value="Sí">Sí</label><label><input type="radio" name="f1" value="No">No</label><label><input type="radio" name="f1" value="Desconoce">Desconoce</label></div></td>
+        <td><input type="text" id="f1_sem" placeholder="$ aprox."></td>
+        <td><span class="tag tag-verify">Verificar</span></td>
+        <td><input type="text" id="f1_obs" placeholder="Con negativa: SAR IMSS 92 a los 60 años; SAR INFONAVIT 92 hasta 65 años."></td>
+      </tr>
+      <!-- G -->
+      <tr style="background:#f0f5ff;">
+        <td colspan="5" style="font-size:7.5pt;font-weight:700;color:#0d6e74;padding:4px 6px;border:1px solid #c5d4ea;">G) APORTACIONES VOLUNTARIAS A AFORE</td>
+      </tr>
+      <tr>
+        <td>¿Realiza aportaciones voluntarias a su Afore?</td>
+        <td><div class="radio-group"><label><input type="radio" name="g1" value="Sí">Sí</label><label><input type="radio" name="g1" value="No">No</label></div></td>
+        <td><input type="text" id="g1_sem" placeholder="$ / mes"></td>
+        <td><span class="tag tag-auto">Complemento</span></td>
+        <td><input type="text" id="g1_obs" placeholder="No aumenta semanas pero mejora monto total bajo Ley 97."></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="divider">
+
+  <!-- RESUMEN SEMANAS -->
+  <div class="sec-header teal">📊 Resumen de Semanas — Inventario Actual y Proyectado</div>
+  <div class="grid-4" style="margin-top:5px;">
+    <div class="field"><label>Semanas IMSS (constancia)</label><input type="number" id="res_imss" placeholder=""></div>
+    <div class="field"><label>Semanas ISSSTE (portabilidad)</label><input type="number" id="res_issste" placeholder=""></div>
+    <div class="field"><label>Semanas descontadas (retiros Afore)</label><input type="number" id="res_desc" placeholder=""></div>
+    <div class="field"><label>Semanas netas actuales</label><input type="number" id="res_netas" placeholder="(A+B) – C"></div>
+    <div class="field"><label>Semanas a recuperar (reintegro Afore)</label><input type="number" id="res_recup" placeholder=""></div>
+    <div class="field"><label>Semanas proyectadas (Mod. 40)</label><input type="number" id="res_mod40" placeholder=""></div>
+    <div class="field"><label>TOTAL PROYECTADO AL PENSIONARSE</label><input type="number" id="res_total" placeholder=""></div>
+    <div class="field"><label>Mínimo Ley 73</label><input type="text" value="500 semanas" readonly style="color:#1a7a4a;font-weight:700;"></div>
+  </div>
+  <div class="alert" style="margin-top:5px;">⚠️ Las últimas 250 semanas cotizadas (≈5 años) son la base del cálculo del SBC promedio para Ley 73. La Modalidad 40 puede elevar significativamente este promedio.</div>
+
+  <!-- 4. DATOS ECONÓMICOS -->
+  <div class="sec-header">💰 4. Datos Económicos</div>
+  <div class="grid-3">
+    <div class="field"><label>SBC actual ($ / día)</label><input type="text" id="sbc_actual" placeholder=""></div>
+    <div class="field"><label>SBC promedio últimas 250 semanas (estimado)</label><input type="text" id="sbc_promedio" placeholder="$ / día"></div>
+    <div class="field"><label>Saldo Afore actual (aprox.)</label><input type="text" id="saldo_afore" placeholder="$"></div>
+    <div class="field"><label>Afore actual</label><input type="text" id="afore_nombre" placeholder=""></div>
+    <div class="field"><label>Grupo salarial estimado (UMAs)</label><input type="text" id="grupo_salarial" placeholder="Ej. Grupo 5 (1.5–2.0 UMAs)"></div>
+    <div class="field"><label>UMA vigente al momento del estudio</label><input type="text" id="uma_vigente" placeholder="$ / día"></div>
+  </div>
+
+  <!-- 5. SALUD Y BENEFICIARIOS -->
+  <div class="sec-header red">🏥 5. Situación de Salud y Beneficiarios</div>
+  <div class="grid-2">
+    <div>
+      <div class="field" style="margin-bottom:5px;"><label>¿Reconocida alguna situación ante IMSS?</label></div>
+      <div class="check-group" style="flex-direction:column;gap:4px;">
+        <label><input type="checkbox" name="salud" value="Incapacidad permanente parcial"> Incapacidad permanente parcial</label>
+        <label><input type="checkbox" name="salud" value="Incapacidad permanente total"> Incapacidad permanente total</label>
+        <label><input type="checkbox" name="salud" value="Invalidez reconocida"> Invalidez reconocida</label>
+        <label><input type="checkbox" name="salud" value="Enfermedad de trabajo"> Enfermedad de trabajo</label>
+        <label><input type="checkbox" name="salud" value="Ninguna"> Ninguna</label>
+      </div>
+    </div>
+    <div>
+      <div class="field"><label>Beneficiarios registrados ante IMSS</label><input type="text" id="beneficiarios" placeholder="Nombres y parentesco"></div>
+      <div class="field" style="margin-top:6px;"><label>¿Cónyuge o dependientes que heredarían pensión?</label>
+        <div class="radio-group"><label><input type="radio" name="herencia" value="Sí">Sí</label><label><input type="radio" name="herencia" value="No">No</label></div>
+      </div>
+      <div class="field"><label>Detallar</label><input type="text" id="herencia_det" placeholder=""></div>
+    </div>
+  </div>
+
+  <!-- 6. DIAGNÓSTICO -->
+  <div class="sec-header green">✅ 6. Diagnóstico — Ley Aplicable y Estimado de Pensión</div>
+  <div class="diag-panel">
+    <div class="diag-title">📌 Resolución del Consultor</div>
+    <div class="diag-grid">
+      <div class="diag-box">
+        <label>¿Puede elegir Ley 73?</label>
+        <div class="radio-group"><label><input type="radio" name="puedeL73" value="Sí">Sí</label><label><input type="radio" name="puedeL73" value="No (solo Ley 97)">No (solo Ley 97)</label></div>
+      </div>
+      <div class="diag-box blue">
+        <label>Ley más conveniente</label>
+        <div class="radio-group"><label><input type="radio" name="leyconv" value="Ley 73">Ley 73</label><label><input type="radio" name="leyconv" value="Ley 97">Ley 97</label></div>
+      </div>
+      <div class="diag-box">
+        <label>Pensión estimada mensual — Ley 73 (Art. 167 LSS)</label>
+        <input type="text" id="pension_l73" placeholder="$ ________________">
+      </div>
+      <div class="diag-box blue">
+        <label>Pensión estimada mensual — Ley 97 (AFORE)</label>
+        <input type="text" id="pension_l97" placeholder="$ ________________">
+      </div>
+      <div class="diag-box">
+        <label>Pensión mínima garantizada Ley 73</label>
+        <input type="text" id="pension_min" placeholder="$ (UMAs × factor)">
+      </div>
+      <div class="diag-box blue">
+        <label>Factor Fox (+11%)</label>
+        <div class="radio-group"><label><input type="radio" name="factorfox" value="Aplica">Aplica</label><label><input type="radio" name="factorfox" value="No aplica">No aplica</label></div>
+      </div>
+      <div class="diag-box" style="grid-column:span 2">
+        <label>Edad recomendada para jubilarse</label>
+        <div class="radio-group" style="margin-top:4px;">
+          <label><input type="radio" name="edadjub" value="60 años (Cesantía)">60 años — Cesantía (anticipada)</label>
+          <label><input type="radio" name="edadjub" value="65 años (Vejez)">65 años — Vejez (completa)</label>
+          <label><input type="radio" name="edadjub" value="Retiro anticipado (1,250 sem)">Retiro anticipado (1,250 sem.)</label>
+          <label><input type="radio" name="edadjub" value="Otra">Otra: <input type="text" id="edadjub_otra" placeholder="especificar" style="width:100px;border-bottom:1px solid #888;font-size:8.5pt;"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. PRESTACIONES ADICIONALES -->
+  <div class="sec-header purple">🎁 7. Prestaciones Adicionales — Ley 73</div>
+  <div class="grid-3">
+    <div class="field"><label>Aguinaldo estimado (Art. 165 — 15 días)</label><input type="text" id="aguinaldo" placeholder="$"></div>
+    <div class="field"><label>Asignación cónyuge (Art. 164 — 15%)</label>
+      <div class="radio-group"><label><input type="radio" name="ay1" value="Aplica">Aplica</label><label><input type="radio" name="ay1" value="No aplica">No aplica</label></div>
+    </div>
+    <div class="field"><label>Asignación hijos (10% c/u, máx. 2)</label>
+      <div class="radio-group"><label><input type="radio" name="ay2" value="0 hijos">0</label><label><input type="radio" name="ay2" value="1 hijo">1</label><label><input type="radio" name="ay2" value="2 hijos">2</label></div>
+    </div>
+    <div class="field"><label>Ayuda asistencial (15% sin beneficiarios)</label>
+      <div class="radio-group"><label><input type="radio" name="ay3" value="Aplica">Aplica</label><label><input type="radio" name="ay3" value="No aplica">No aplica</label></div>
+    </div>
+    <div class="field"><label>PENSIÓN TOTAL ESTIMADA (con asignaciones)</label><input type="text" id="pension_total" placeholder="$" style="font-weight:700;color:#1a7a4a;"></div>
+    <div class="field"><label>Notas Ley 97 comparativa</label><input type="text" id="notas_l97" placeholder=""></div>
+  </div>
+
+  <!-- 8. DOCUMENTOS -->
+  <div class="sec-header">📁 8. Documentos Presentados / Pendientes</div>
+  <div class="grid-2" style="margin-top:4px;">
+    <div>
+      <div class="check-group" style="flex-direction:column;gap:4px;">
+        <label><input type="checkbox" name="docs" value="Constancia semanas IMSS (IMSS-02-025)"> Constancia de Semanas Cotizadas IMSS</label>
+        <label><input type="checkbox" name="docs" value="Estado cuenta Afore"> Estado de cuenta Afore (máx. 6 meses)</label>
+        <label><input type="checkbox" name="docs" value="Acta de nacimiento"> Acta de nacimiento</label>
+        <label><input type="checkbox" name="docs" value="Identificación oficial"> Identificación oficial vigente (INE / pasaporte)</label>
+        <label><input type="checkbox" name="docs" value="CURP"> CURP</label>
+        <label><input type="checkbox" name="docs" value="Comprobante domicilio"> Comprobante de domicilio (máx. 3 meses)</label>
+        <label><input type="checkbox" name="docs" value="Estado cuenta bancario CLABE"> Estado de cuenta bancario con CLABE</label>
+      </div>
+    </div>
+    <div>
+      <div class="check-group" style="flex-direction:column;gap:4px;">
+        <label><input type="checkbox" name="docs" value="Acta de matrimonio"> Acta de matrimonio (si aplica)</label>
+        <label><input type="checkbox" name="docs" value="Actas nacimiento hijos"> Actas de nacimiento hijos (si aplica)</label>
+        <label><input type="checkbox" name="docs" value="Constancia períodos ISSSTE"> Constancia períodos ISSSTE (portabilidad)</label>
+        <label><input type="checkbox" name="docs" value="Comprobantes empleos anteriores"> Comprobantes empleos anteriores (CFDI, nóminas)</label>
+        <label><input type="checkbox" name="docs" value="Resolución incapacidad/invalidez IMSS"> Resolución incapacidad / invalidez IMSS</label>
+        <label><input type="checkbox" name="docs" value="Constancia vigencia derechos"> Constancia de vigencia de derechos</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. PASOS SIGUIENTES -->
+  <div class="sec-header">🗺️ 9. Pasos Siguientes Recomendados</div>
+  <ul class="pasos-list">
+    <li><input type="checkbox" name="pasos" value="Constancia semanas IMSS Digital"><span>Obtener Constancia de Semanas Cotizadas en IMSS Digital</span></li>
+    <li><input type="checkbox" name="pasos" value="Estado cuenta Afore / verificar semanas descontadas"><span>Solicitar estado de cuenta Afore y verificar semanas descontadas por retiros</span></li>
+    <li><input type="checkbox" name="pasos" value="Reintegrar retiros parciales Afore"><span>Reintegrar retiros parciales por desempleo a la Afore para recuperar semanas</span></li>
+    <li><input type="checkbox" name="pasos" value="Trámite portabilidad IMSS-ISSSTE"><span>Tramitar portabilidad IMSS-ISSSTE en subdelegación (si aplica)</span></li>
+    <li><input type="checkbox" name="pasos" value="Iniciar / evaluar Modalidad 40"><span>Iniciar o evaluar Modalidad 40 para acumular semanas y mejorar SBC promedio</span></li>
+    <li><input type="checkbox" name="pasos" value="Aclaración semanas empleos anteriores"><span>Solicitar aclaración de semanas ante IMSS por periodos faltantes</span></li>
+    <li><input type="checkbox" name="pasos" value="Cita subdelegación IMSS / Mi Pensión Digital"><span>Cita en Subdelegación IMSS para iniciar trámite (Mi Pensión Digital)</span></li>
+    <li><input type="checkbox" name="pasos" value="Verificar saldo SAR 92 / INFONAVIT 92"><span>Revisar saldo SAR IMSS 92 / SAR INFONAVIT 92 ante Afore</span></li>
+    <li><input type="checkbox" name="pasos" value="Reunir expediente documental completo"><span>Reunir expediente documental completo</span></li>
+  </ul>
+
+  <!-- 10. OBSERVACIONES -->
+  <div class="sec-header">📝 10. Observaciones del Consultor</div>
+  <textarea id="observaciones" placeholder="Observaciones generales, estrategia recomendada, alertas o notas del consultor..." style="width:100%;min-height:52px;border:1.5px solid #aac0de;border-radius:4px;font-family:inherit;font-size:9pt;padding:5px;color:#1a1a2e;outline:none;margin-top:4px;"></textarea>
+
+  <!-- FIRMAS -->
+  <div class="firmas">
+    <div class="firma-box"><div class="firma-line">Firma del Consultor<br><small>C.P. Armando Gallardo Terán · armgallardo@gmail.com</small></div></div>
+    <div class="firma-box"><div class="firma-line">Firma del Cliente<br><small>Nombre: ___________________________</small></div></div>
+  </div>
+
+  <div style="text-align:center;margin-top:8px;font-size:7pt;color:#888;border-top:1px solid #eee;padding-top:5px;">
+    Consultoría de Pensiones IMSS · Aguascalientes, México · Este estudio es de carácter informativo y no sustituye la resolución oficial del IMSS.
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  // ─── UTILIDADES ─────────────────────────────────────────────────────────────
+
+  function getRadio(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '—';
+  }
+
+  function getCheckboxes(name) {
+    return [...document.querySelectorAll(`input[name="${name}"]:checked`)]
+      .map(e => e.value).join(', ') || '—';
+  }
+
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? (el.value.trim() || '—') : '—';
+  }
+
+  // ─── MODAL ──────────────────────────────────────────────────────────────────
+
+  function abrirModal() {
+    // Pre-llenar nombre en modal
+    document.getElementById('confirmNombre').value = val('nombre') !== '—' ? val('nombre') : '';
+    document.getElementById('successMsg').style.display = 'none';
+    document.getElementById('errorMsg').style.display = 'none';
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+
+  function cerrarModal() {
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+
+  // Cerrar modal al hacer clic fuera
+  document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModal();
+  });
+
+  // ─── RECOLECTAR DATOS ────────────────────────────────────────────────────────
+
+  function recolectarDatos() {
+    return {
+      // Encabezado
+      folio:              val('folio'),
+      fecha:              val('fecha'),
+      // Datos del cliente
+      nombre:             val('nombre'),
+      fecha_nacimiento:   val('fnac'),
+      edad:               val('edad'),
+      nss:                val('nss'),
+      curp:               val('curp'),
+      telefono:           val('tel'),
+      correo:             val('correo'),
+      ocupacion:          val('ocupacion'),
+      patron_nombre:      val('patron_nombre'),
+      situacion_laboral:  val('situacion_laboral'),
+      // Historial
+      fecha_alta_imss:    val('fecha_alta'),
+      semanas_constancia: val('semanas_constancia'),
+      cotizo_antes_1997:  getRadio('ley73'),
+      periodos_sin:       val('periodos_sin'),
+      multipatron:        getRadio('multipatron'),
+      conservacion_der:   getRadio('conserva'),
+      // Semanas A
+      a1_aplica: getRadio('a1'), a1_semanas: val('a1_sem'), a1_obs: val('a1_obs'),
+      a2_aplica: getRadio('a2'), a2_semanas: val('a2_sem'), a2_obs: val('a2_obs'),
+      a3_aplica: getRadio('a3'), a3_semanas: val('a3_sem'), a3_obs: val('a3_obs'),
+      // Semanas B
+      b1_aplica: getRadio('b1'), b1_semanas: val('b1_sem'), b1_obs: val('b1_obs'),
+      b2_aplica: getRadio('b2'), b2_semanas: val('b2_sem'), b2_obs: val('b2_obs'),
+      b3_monto: val('b3_monto'), b3_obs: val('b3_obs'),
+      // Semanas C
+      c1_aplica: getRadio('c1'), c1_semanas: val('c1_sem'), c1_obs: val('c1_obs'),
+      c2_ultimo_inst: getRadio('c2'), c2_obs: val('c2_obs'),
+      c3_constancia: getRadio('c3'), c3_obs: val('c3_obs'),
+      // Semanas D
+      d1_aplica: getRadio('d1'), d1_semanas: val('d1_sem'), d1_obs: val('d1_obs'),
+      d2_sbc: val('d2_sbc'), d2_obs: val('d2_obs'),
+      d3_total: val('d3_total'), d3_obs: val('d3_obs'),
+      // Semanas E
+      e1_aplica: getRadio('e1'), e1_semanas: val('e1_sem'), e1_obs: val('e1_obs'),
+      // Semanas F
+      f1_aplica: getRadio('f1'), f1_saldo: val('f1_sem'), f1_obs: val('f1_obs'),
+      // Semanas G
+      g1_aplica: getRadio('g1'), g1_monto: val('g1_sem'), g1_obs: val('g1_obs'),
+      // Resumen semanas
+      res_imss:   val('res_imss'),
+      res_issste: val('res_issste'),
+      res_desc:   val('res_desc'),
+      res_netas:  val('res_netas'),
+      res_recup:  val('res_recup'),
+      res_mod40:  val('res_mod40'),
+      res_total:  val('res_total'),
+      // Datos económicos
+      sbc_actual:     val('sbc_actual'),
+      sbc_promedio:   val('sbc_promedio'),
+      saldo_afore:    val('saldo_afore'),
+      afore_nombre:   val('afore_nombre'),
+      grupo_salarial: val('grupo_salarial'),
+      uma_vigente:    val('uma_vigente'),
+      // Salud y beneficiarios
+      situacion_salud: getCheckboxes('salud'),
+      beneficiarios:   val('beneficiarios'),
+      herencia:        getRadio('herencia'),
+      herencia_det:    val('herencia_det'),
+      // Diagnóstico
+      puede_ley73:   getRadio('puedeL73'),
+      ley_conveniente: getRadio('leyconv'),
+      pension_l73:   val('pension_l73'),
+      pension_l97:   val('pension_l97'),
+      pension_min:   val('pension_min'),
+      factor_fox:    getRadio('factorfox'),
+      edad_jubilarse: getRadio('edadjub'),
+      edadjub_otra:  val('edadjub_otra'),
+      // Prestaciones
+      aguinaldo:      val('aguinaldo'),
+      asig_conyuge:   getRadio('ay1'),
+      asig_hijos:     getRadio('ay2'),
+      ayuda_asist:    getRadio('ay3'),
+      pension_total:  val('pension_total'),
+      notas_l97:      val('notas_l97'),
+      // Documentos y pasos
+      documentos:     getCheckboxes('docs'),
+      pasos_sig:      getCheckboxes('pasos'),
+      observaciones:  val('observaciones'),
+    };
+  }
+
+  // ─── FORMATEAR CUERPO DEL CORREO ────────────────────────────────────────────
+
+  function formatearMensaje(d) {
+    return `
+════════════════════════════════════════
+ESTUDIO DE PENSIÓN IMSS — LEY 1973
+Consultoría de Pensiones · Aguascalientes
+════════════════════════════════════════
+Folio: ${d.folio} | Fecha: ${d.fecha}
+
+── 1. DATOS DEL CLIENTE ──────────────
+Nombre:             ${d.nombre}
+Fecha nacimiento:   ${d.fecha_nacimiento}
+Edad:               ${d.edad}
+NSS:                ${d.nss}
+CURP:               ${d.curp}
+Teléfono/WhatsApp:  ${d.telefono}
+Correo:             ${d.correo}
+Ocupación:          ${d.ocupacion}
+Último patrón IMSS: ${d.patron_nombre}
+Situación laboral:  ${d.situacion_laboral}
+
+── 2. HISTORIAL DE COTIZACIÓN ────────
+Fecha alta IMSS:    ${d.fecha_alta_imss}
+Semanas constancia: ${d.semanas_constancia}
+Cotizó antes 1997:  ${d.cotizo_antes_1997}
+Periodos sin cotiz: ${d.periodos_sin}
+Más de un patrón:   ${d.multipatron}
+Conservación der.:  ${d.conservacion_der}
+
+── 3. ANÁLISIS DE SEMANAS ────────────
+
+A) SEMANAS REGULARES
+  A1 - Registradas en IMSS:           Aplica: ${d.a1_aplica} | Semanas: ${d.a1_semanas} | ${d.a1_obs}
+  A2 - Omisión patronal:              Aplica: ${d.a2_aplica} | Semanas: ${d.a2_semanas} | ${d.a2_obs}
+  A3 - Empleos anteriores no visibles: Aplica: ${d.a3_aplica} | Semanas: ${d.a3_semanas} | ${d.a3_obs}
+
+B) RETIROS PARCIALES AFORE
+  B1 - Retiro por desempleo:  Aplica: ${d.b1_aplica} | Semanas: ${d.b1_semanas} | ${d.b1_obs}
+  B2 - Retiro por matrimonio: Aplica: ${d.b2_aplica} | Semanas: ${d.b2_semanas} | ${d.b2_obs}
+  B3 - Monto retirado:        ${d.b3_monto} | ${d.b3_obs}
+
+C) PORTABILIDAD ISSSTE
+  C1 - Periodos ISSSTE:  Aplica: ${d.c1_aplica} | Semanas: ${d.c1_semanas} | ${d.c1_obs}
+  C2 - Última cotización: ${d.c2_ultimo_inst} | ${d.c2_obs}
+  C3 - Constancia períodos reconocidos: ${d.c3_constancia} | ${d.c3_obs}
+
+D) MODALIDAD 40
+  D1 - Inscrito/puede inscribirse: ${d.d1_aplica} | Semanas proy.: ${d.d1_semanas} | ${d.d1_obs}
+  D2 - SBC Modalidad 40:           ${d.d2_sbc} | ${d.d2_obs}
+  D3 - Total proyectado:           ${d.d3_total} | ${d.d3_obs}
+
+E) MODALIDAD 10
+  E1 - Aplica: ${d.e1_aplica} | Semanas: ${d.e1_semanas} | ${d.e1_obs}
+
+F) SAR 92 / INFONAVIT 92
+  F1 - Tiene saldo: ${d.f1_aplica} | Saldo aprox: ${d.f1_saldo} | ${d.f1_obs}
+
+G) APORTACIONES VOLUNTARIAS AFORE
+  G1 - Realiza aportaciones: ${d.g1_aplica} | Monto: ${d.g1_monto} | ${d.g1_obs}
+
+── RESUMEN DE SEMANAS ────────────────
+  IMSS (constancia):        ${d.res_imss}
+  ISSSTE (portabilidad):    ${d.res_issste}
+  Descontadas (retiros):    ${d.res_desc}
+  Netas actuales:           ${d.res_netas}
+  A recuperar (reintegro):  ${d.res_recup}
+  Proyectadas (Mod. 40):    ${d.res_mod40}
+  TOTAL PROYECTADO:         ${d.res_total}
+
+── 4. DATOS ECONÓMICOS ───────────────
+SBC actual:           ${d.sbc_actual}
+SBC promedio 250 sem: ${d.sbc_promedio}
+Saldo Afore:          ${d.saldo_afore}
+Afore:                ${d.afore_nombre}
+Grupo salarial:       ${d.grupo_salarial}
+UMA vigente:          ${d.uma_vigente}
+
+── 5. SALUD Y BENEFICIARIOS ──────────
+Situación de salud: ${d.situacion_salud}
+Beneficiarios:      ${d.beneficiarios}
+Hereda pensión:     ${d.herencia} — ${d.herencia_det}
+
+── 6. DIAGNÓSTICO ────────────────────
+¿Puede elegir Ley 73?:  ${d.puede_ley73}
+Ley más conveniente:    ${d.ley_conveniente}
+Pensión estimada L73:   ${d.pension_l73}
+Pensión estimada L97:   ${d.pension_l97}
+Pensión mínima L73:     ${d.pension_min}
+Factor Fox (+11%):      ${d.factor_fox}
+Edad jubilarse:         ${d.edad_jubilarse} ${d.edadjub_otra !== '—' ? '(' + d.edadjub_otra + ')' : ''}
+
+── 7. PRESTACIONES ADICIONALES ───────
+Aguinaldo estimado:   ${d.aguinaldo}
+Asig. cónyuge (15%):  ${d.asig_conyuge}
+Asig. hijos:          ${d.asig_hijos}
+Ayuda asistencial:    ${d.ayuda_asist}
+PENSIÓN TOTAL:        ${d.pension_total}
+Notas Ley 97:         ${d.notas_l97}
+
+── 8. DOCUMENTOS ─────────────────────
+${d.documentos}
+
+── 9. PASOS SIGUIENTES ───────────────
+${d.pasos_sig}
+
+── 10. OBSERVACIONES DEL CONSULTOR ──
+${d.observaciones}
+
+════════════════════════════════════════
+Enviado desde: Consultoría de Pensiones · Aguascalientes
+armgallardo@gmail.com
+════════════════════════════════════════
+`.trim();
+  }
+
+  // ─── ENVIAR VÍA FORMSPREE ────────────────────────────────────────────────────
+
+  async function enviarFormulario() {
+    const nombreConfirm = document.getElementById('confirmNombre').value.trim();
+    if (!nombreConfirm) {
+      alert('Por favor escriba el nombre del cliente para confirmar el envío.');
+      return;
+    }
+
+    const datos = recolectarDatos();
+    const mensaje = formatearMensaje(datos);
+
+    // UI: mostrar spinner
+    document.querySelector('.modal .btn-send').style.display = 'none';
+    document.querySelector('.modal-cancel-wrap').style.display = 'none';
+    document.getElementById('spinner').style.display = 'block';
+    document.getElementById('successMsg').style.display = 'none';
+    document.getElementById('errorMsg').style.display = 'none';
+
+    try {
+      // FORMSPREE: reemplazar YOUR_FORM_ID con el ID real al registrarse en formspree.io
+      const response = await fetch('https://formspree.io/f/xkoloyob', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          _subject: `📋 Diagnóstico Pensión IMSS — ${nombreConfirm} — Folio ${datos.folio}`,
+          _replyto: datos.correo !== '—' ? datos.correo : 'sin-correo@indicado.com',
+          cliente:  nombreConfirm,
+          folio:    datos.folio,
+          fecha:    datos.fecha,
+          diagnostico_completo: mensaje,
+        })
+      });
+
+      document.getElementById('spinner').style.display = 'none';
+
+      if (response.ok) {
+        document.getElementById('successMsg').style.display = 'block';
+        setTimeout(() => cerrarModal(), 2800);
+      } else {
+        throw new Error('Respuesta no OK');
+      }
+    } catch (err) {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('errorMsg').style.display = 'block';
+      document.querySelector('.modal .btn-send').style.display = 'block';
+    }
+  }
+
+  // ─── LIMPIAR FORMULARIO ──────────────────────────────────────────────────────
+
+  function limpiarFormulario() {
+    if (!confirm('¿Desea limpiar todos los campos del formulario?')) return;
+    document.querySelectorAll('input[type=text], input[type=number], textarea, select')
+      .forEach(e => e.value = '');
+    document.querySelectorAll('input[type=checkbox], input[type=radio]')
+      .forEach(e => e.checked = false);
+  }
+
+  // Fecha automática al cargar
+  window.addEventListener('load', () => {
+    const hoy = new Date();
+    const dd = String(hoy.getDate()).padStart(2,'0');
+    const mm = String(hoy.getMonth()+1).padStart(2,'0');
+    const aa = hoy.getFullYear();
+    const fechaEl = document.getElementById('fecha');
+    if (fechaEl && !fechaEl.value) fechaEl.value = `${dd}/${mm}/${aa}`;
+  });
+</script>
+
+</body>
+</html>
