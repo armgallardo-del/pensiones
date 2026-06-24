@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Registro de Pensión IMSS — Consultoría de Pensiones</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f0f4f8;
+    color: #1a1a2e;
+    font-size: 16px;
+    padding-bottom: 40px;
+  }
+
+  /* HEADER */
+  .top-bar {
+    background: #1a4e8c;
+    color: #fff;
+    padding: 18px 20px 14px;
+    text-align: center;
+  }
+  .top-bar h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .top-bar p  { font-size: 13px; opacity: .85; }
+
+  .progress-wrap { background: #1a4e8c; padding: 0 20px 14px; }
+  .progress-bar-bg { background: rgba(255,255,255,.25); border-radius: 10px; height: 6px; }
+  .progress-bar-fill { background: #f0a500; border-radius: 10px; height: 6px; transition: width .4s; }
+  .progress-label { color: rgba(255,255,255,.8); font-size: 12px; margin-top: 5px; text-align: right; }
+
+  /* CARD / SECCIÓN */
+  .card {
+    background: #fff;
+    margin: 16px 14px 0;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    background: #1a4e8c;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-header.orange { background: #c06000; }
+  .card-header.red    { background: #8c2020; }
+  .card-body { padding: 14px 16px; }
+
+  /* CAMPOS */
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 6px;
+  }
+  .field .hint {
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+  .field input[type="text"],
+  .field input[type="number"],
+  .field input[type="tel"],
+  .field input[type="email"],
+  .field select {
+    width: 100%;
+    border: 1.5px solid #c5d4ea;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 16px;
+    font-family: inherit;
+    color: #1a1a2e;
+    background: #f8faff;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  .field input:focus, .field select:focus {
+    border-color: #1a4e8c;
+    background: #fff;
+  }
+
+  /* RADIO BUTTONS GRANDES */
+  .radio-list { display: flex; flex-direction: column; gap: 8px; }
+  .radio-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8faff;
+    border: 1.5px solid #c5d4ea;
+    border-radius: 8px;
+    padding: 13px 14px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .radio-item:active { background: #e8eef8; }
+  .radio-item input[type="radio"] { width: 20px; height: 20px; accent-color: #1a4e8c; flex-shrink: 0; }
+  .radio-item span { font-size: 15px; color: #1a1a2e; line-height: 1.3; }
+  .radio-item.selected { border-color: #1a4e8c; background: #eef3ff; }
+
+  /* CHECKBOX GRANDES */
+  .check-list { display: flex; flex-direction: column; gap: 8px; }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #f8faff;
+    border: 1.5px solid #c5d4ea;
+    border-radius: 8px;
+    padding: 13px 14px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .check-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: #1a4e8c; flex-shrink: 0; margin-top: 2px; }
+  .check-item span { font-size: 15px; color: #1a1a2e; line-height: 1.4; }
+  .check-item.selected { border-color: #1a4e8c; background: #eef3ff; }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid #eef0f5; margin: 6px 0 16px; }
+
+  /* ALERTA INFO */
+  .info-box {
+    background: #f0f5ff;
+    border-left: 4px solid #1a4e8c;
+    border-radius: 0 8px 8px 0;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #1a4e8c;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+
+  /* BOTÓN ENVIAR */
+  .btn-wrap { padding: 20px 14px 0; }
+  .btn-enviar {
+    width: 100%;
+    background: #1a7a4a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 14px rgba(26,122,74,.3);
+  }
+  .btn-enviar:active { opacity: .85; }
+
+  /* SPINNER / SUCCESS */
+  .spinner-wrap { display: none; text-align: center; padding: 30px 20px; }
+  .spinner { width: 40px; height: 40px; border: 4px solid #dde; border-top-color: #1a4e8c; border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto 14px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .success-wrap { display: none; text-align: center; padding: 30px 20px; }
+  .success-icon { font-size: 56px; margin-bottom: 12px; }
+  .success-wrap h2 { color: #1a7a4a; font-size: 20px; margin-bottom: 8px; }
+  .success-wrap p  { color: #555; font-size: 14px; line-height: 1.6; }
+  .error-wrap { display: none; background: #fdecea; border-radius: 8px; padding: 14px; margin: 14px; color: #8c2020; font-size: 14px; text-align: center; }
+
+  /* PIE */
+  .pie { text-align: center; padding: 24px 20px 10px; font-size: 12px; color: #999; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<div id="form-wrap">
+
+  <!-- HEADER -->
+  <div class="top-bar">
+    <h1>📋 Registro de Pensión IMSS</h1>
+    <p>Consultoría de Pensiones · Aguascalientes</p>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+    <div class="progress-label" id="progressLabel">Sección 1 de 4</div>
+  </div>
+
+  <div class="info-box" style="margin: 14px 14px 0;">
+    Por favor llene este formulario con sus datos. La información es confidencial y será utilizada únicamente para elaborar su diagnóstico de pensión.
+  </div>
+
+  <!-- SECCIÓN 1: DATOS PERSONALES -->
+  <div class="card">
+    <div class="card-header">👤 1. Datos Personales</div>
+    <div class="card-body">
+      <div class="field">
+        <label>Nombre completo *</label>
+        <input type="text" id="c_nombre" placeholder="Apellidos y nombre(s)" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Fecha de nacimiento *</label>
+        <input type="text" id="c_fnac" placeholder="DD/MM/AAAA">
+      </div>
+      <div class="field">
+        <label>Edad actual</label>
+        <input type="number" id="c_edad" placeholder="Años cumplidos" min="18" max="90">
+      </div>
+      <div class="field">
+        <label>Número de Seguridad Social (NSS) *</label>
+        <div class="hint">Lo encuentra en su credencial del IMSS o en su estado de cuenta Afore.</div>
+        <input type="text" id="c_nss" placeholder="11 dígitos" maxlength="11" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>CURP</label>
+        <input type="text" id="c_curp" placeholder="18 caracteres" maxlength="18" style="text-transform:uppercase;">
+      </div>
+      <div class="field">
+        <label>Teléfono / WhatsApp *</label>
+        <input type="tel" id="c_tel" placeholder="10 dígitos" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" id="c_correo" placeholder="ejemplo@correo.com" inputmode="email">
+      </div>
+      <div class="field">
+        <label>Ocupación actual</label>
+        <input type="text" id="c_ocupacion" placeholder="¿A qué se dedica actualmente?">
+      </div>
+      <div class="field">
+        <label>Último patrón (empresa donde trabajó en IMSS)</label>
+        <input type="text" id="c_patron" placeholder="Nombre de la empresa">
+      </div>
+      <div class="field">
+        <label>Situación laboral actual</label>
+        <select id="c_sit_lab">
+          <option value="">-- Seleccione --</option>
+          <option>Activo (trabajando)</option>
+          <option>Desempleado</option>
+          <option>Cuenta propia / independiente</option>
+          <option>Modalidad 40 activa</option>
+          <option>Jubilado de otro régimen</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2: HISTORIAL COTIZACIÓN -->
+  <div class="card">
+    <div class="card-header">📋 2. Historial de Cotización IMSS</div>
+    <div class="card-body">
+      <div class="field">
+        <label>¿En qué fecha se dio de alta por primera vez en el IMSS?</label>
+        <div class="hint">Fecha aproximada es suficiente si no la recuerda exacta.</div>
+        <input type="text" id="c_fecha_alta" placeholder="DD/MM/AAAA o año aproximado">
+      </div>
+      <div class="field">
+        <label>¿Cuántas semanas cotizadas tiene aproximadamente?</label>
+        <div class="hint">Si no lo sabe, déjelo en blanco — lo verificaremos con la constancia IMSS.</div>
+        <input type="number" id="c_semanas" placeholder="Ej. 800, 1200..." min="0">
+      </div>
+      <div class="field">
+        <label>¿Comenzó a trabajar y cotizar al IMSS antes del 1° de julio de 1997?</label>
+        <div class="hint">Esto determina si puede acceder a los beneficios de la Ley 73, generalmente más favorables.</div>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_ley73" value="Sí (Ley 73)"><span>Sí, comencé antes de julio de 1997</span></label>
+          <label class="radio-item"><input type="radio" name="c_ley73" value="No (Ley 97)"><span>No, comencé después de julio de 1997</span></label>
+          <label class="radio-item"><input type="radio" name="c_ley73" value="No recuerdo"><span>No recuerdo / No estoy seguro</span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label>¿Ha tenido periodos en los que dejó de cotizar al IMSS?</label>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_periodos" value="Sí"><span>Sí</span></label>
+          <label class="radio-item"><input type="radio" name="c_periodos" value="No"><span>No, he cotizado de forma continua</span></label>
+        </div>
+      </div>
+      <div class="field" id="field_periodos_det" style="display:none;">
+        <label>¿En qué periodos aproximadamente?</label>
+        <input type="text" id="c_periodos_det" placeholder="Ej. 2005–2008, 2015–2016">
+      </div>
+      <div class="field">
+        <label>¿Ha tenido más de un patrón (empresa) a lo largo de su vida laboral?</label>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_multipatron" value="Sí"><span>Sí, he trabajado en varias empresas</span></label>
+          <label class="radio-item"><input type="radio" name="c_multipatron" value="No"><span>No, solo he tenido un patrón</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3: SITUACIÓN DE SEMANAS -->
+  <div class="card">
+    <div class="card-header orange">🔍 3. Situación de sus Semanas Cotizadas</div>
+    <div class="card-body">
+
+      <div class="info-box">Estas preguntas nos ayudan a identificar si tiene semanas que se pueden recuperar para mejorar su pensión.</div>
+
+      <div class="field">
+        <label>¿Ha realizado retiros parciales de su Afore por desempleo?</label>
+        <div class="hint">Este retiro descuenta semanas cotizadas. Si lo hizo, pueden recuperarse reintegrando el dinero.</div>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_retiro_desempleo" value="Sí"><span>Sí, hice un retiro por desempleo</span></label>
+          <label class="radio-item"><input type="radio" name="c_retiro_desempleo" value="No"><span>No</span></label>
+          <label class="radio-item"><input type="radio" name="c_retiro_desempleo" value="No sé"><span>No sé / No recuerdo</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Ha realizado retiro parcial de su Afore por matrimonio?</label>
+        <div class="hint">Este retiro NO descuenta semanas — solo se menciona para tener el historial completo.</div>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_retiro_mat" value="Sí"><span>Sí</span></label>
+          <label class="radio-item"><input type="radio" name="c_retiro_mat" value="No"><span>No</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Ha trabajado en alguna dependencia de gobierno federal, estatal o municipal? (ISSSTE)</label>
+        <div class="hint">Por ejemplo: SEP, IMSS como trabajador, SSA, municipio, gobierno del estado, universidades públicas, etc.</div>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_issste" value="Sí"><span>Sí, trabajé en el sector público</span></label>
+          <label class="radio-item"><input type="radio" name="c_issste" value="No"><span>No, siempre en empresa privada</span></label>
+        </div>
+      </div>
+
+      <div class="field" id="field_issste_det" style="display:none;">
+        <label>¿En qué institución trabajó y aproximadamente cuánto tiempo?</label>
+        <input type="text" id="c_issste_det" placeholder="Ej. SEP, 5 años (2000–2005)">
+      </div>
+
+      <div class="field">
+        <label>¿Actualmente está inscrito en Modalidad 40 (cotización voluntaria al IMSS)?</label>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_mod40" value="Sí"><span>Sí, estoy en Modalidad 40</span></label>
+          <label class="radio-item"><input type="radio" name="c_mod40" value="No"><span>No</span></label>
+          <label class="radio-item"><input type="radio" name="c_mod40" value="No sé qué es"><span>No sé qué es</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Tiene o ha tenido cuenta Afore?</label>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_afore" value="Sí, sé cuál es"><span>Sí, sé cuál es</span></label>
+          <label class="radio-item"><input type="radio" name="c_afore" value="Sí, pero no recuerdo cuál"><span>Sí, pero no recuerdo cuál</span></label>
+          <label class="radio-item"><input type="radio" name="c_afore" value="No sé"><span>No sé</span></label>
+        </div>
+      </div>
+
+      <div class="field" id="field_afore_nombre" style="display:none;">
+        <label>¿Cuál es su Afore?</label>
+        <select id="c_afore_nombre">
+          <option value="">-- Seleccione --</option>
+          <option>Afore XXI Banorte</option><option>Citibanamex Afore</option>
+          <option>SURA</option><option>Principal</option><option>Profuturo</option>
+          <option>Invercap</option><option>Inbursa</option><option>Coppel Afore</option>
+          <option>PensionISSSTE</option><option>No recuerdo</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>¿Sabe si tiene fondos del SAR 1992 o INFONAVIT 92?</label>
+        <div class="hint">Son fondos de ahorro de antes de 1997. Muchas personas los tienen sin saberlo.</div>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_sar" value="Sí"><span>Sí tengo</span></label>
+          <label class="radio-item"><input type="radio" name="c_sar" value="No"><span>No tengo</span></label>
+          <label class="radio-item"><input type="radio" name="c_sar" value="No sé"><span>No sé / No estoy seguro</span></label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5: SALUD Y BENEFICIARIOS -->
+  <div class="card">
+    <div class="card-header red">🏥 4. Salud y Beneficiarios</div>
+    <div class="card-body">
+
+      <div class="field">
+        <label>¿Tiene reconocida alguna de las siguientes situaciones ante el IMSS?</label>
+        <div class="hint">Seleccione todas las que apliquen.</div>
+        <div class="check-list">
+          <label class="check-item"><input type="checkbox" name="c_salud" value="Incapacidad permanente parcial"><span>Incapacidad permanente parcial</span></label>
+          <label class="check-item"><input type="checkbox" name="c_salud" value="Incapacidad permanente total"><span>Incapacidad permanente total</span></label>
+          <label class="check-item"><input type="checkbox" name="c_salud" value="Invalidez reconocida por el IMSS"><span>Invalidez reconocida por el IMSS</span></label>
+          <label class="check-item"><input type="checkbox" name="c_salud" value="Enfermedad de trabajo"><span>Enfermedad de trabajo</span></label>
+          <label class="check-item"><input type="checkbox" name="c_salud" value="Ninguna"><span>Ninguna de las anteriores</span></label>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="field">
+        <label>¿Tiene cónyuge (esposo/a) registrado como beneficiario en el IMSS?</label>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_conyuge" value="Sí"><span>Sí</span></label>
+          <label class="radio-item"><input type="radio" name="c_conyuge" value="No"><span>No</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>¿Tiene hijos registrados como beneficiarios en el IMSS?</label>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_hijos_ben" value="Sí"><span>Sí</span></label>
+          <label class="radio-item"><input type="radio" name="c_hijos_ben" value="No"><span>No</span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Nombres de sus beneficiarios registrados ante el IMSS</label>
+        <div class="hint">Opcional — si los recuerda.</div>
+        <input type="text" id="c_beneficiarios" placeholder="Nombre(s) y parentesco">
+      </div>
+
+      <div class="field">
+        <label>¿Hay personas que dependerían económicamente de su pensión?</label>
+        <div class="hint">Esto es importante para calcular las asignaciones familiares.</div>
+        <div class="radio-list">
+          <label class="radio-item"><input type="radio" name="c_dependientes" value="Sí"><span>Sí</span></label>
+          <label class="radio-item"><input type="radio" name="c_dependientes" value="No"><span>No</span></label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTÓN ENVIAR -->
+  <div class="btn-wrap">
+    <button class="btn-enviar" onclick="enviarCliente()">
+      ✅ Enviar mi información
+    </button>
+  </div>
+
+  <div class="error-wrap" id="errorWrap">
+    ❌ Ocurrió un error al enviar. Verifique su conexión e intente de nuevo.
+  </div>
+
+  <div class="pie">
+    Consultoría de Pensiones · Aguascalientes<br>
+    C.P. Armando Gallardo Terán · armgallardo@gmail.com<br>
+    Su información es confidencial y se usará únicamente para elaborar su diagnóstico de pensión.
+  </div>
+
+</div><!-- /form-wrap -->
+
+<!-- SPINNER -->
+<div class="spinner-wrap" id="spinnerWrap">
+  <div class="spinner"></div>
+  <p style="color:#555;font-size:15px;">Enviando su información...</p>
+</div>
+
+<!-- ÉXITO -->
+<div class="success-wrap" id="successWrap">
+  <div class="success-icon">✅</div>
+  <h2>¡Información enviada correctamente!</h2>
+  <p>El C.P. Armando Gallardo Terán ha recibido sus datos y se pondrá en contacto con usted para continuar con su diagnóstico de pensión.</p>
+  <p style="margin-top:14px;font-size:13px;color:#888;">Consultoría de Pensiones · Aguascalientes</p>
+</div>
+
+<script>
+// Mostrar/ocultar campos condicionales
+document.querySelectorAll('input[name="c_periodos"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('field_periodos_det').style.display = r.value === 'Sí' ? 'block' : 'none';
+  });
+});
+document.querySelectorAll('input[name="c_issste"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('field_issste_det').style.display = r.value === 'Sí' ? 'block' : 'none';
+  });
+});
+document.querySelectorAll('input[name="c_afore"]').forEach(r => {
+  r.addEventListener('change', () => {
+    document.getElementById('field_afore_nombre').style.display = r.value === 'Sí, sé cuál es' ? 'block' : 'none';
+  });
+});
+
+// Estilo visual al seleccionar radio/check
+document.querySelectorAll('.radio-item input').forEach(inp => {
+  inp.addEventListener('change', () => {
+    document.querySelectorAll(`input[name="${inp.name}"]`).forEach(i => i.closest('.radio-item').classList.remove('selected'));
+    inp.closest('.radio-item').classList.add('selected');
+    actualizarProgreso();
+  });
+});
+document.querySelectorAll('.check-item input').forEach(inp => {
+  inp.addEventListener('change', () => {
+    inp.closest('.check-item').classList.toggle('selected', inp.checked);
+  });
+});
+
+// Progreso
+function actualizarProgreso() {
+  const campos = ['c_nombre','c_fnac','c_nss','c_tel'];
+  const radios = ['c_ley73','c_periodos','c_retiro_desempleo','c_issste','c_mod40','c_afore','c_sar','c_conyuge','c_hijos_ben'];
+  let llenos = 0;
+  const total = campos.length + radios.length;
+  campos.forEach(id => { if (document.getElementById(id)?.value.trim()) llenos++; });
+  radios.forEach(n => { if (document.querySelector(`input[name="${n}"]:checked`)) llenos++; });
+  const pct = Math.round((llenos / total) * 100);
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = pct + '% completado';
+}
+document.querySelectorAll('input[type=text],input[type=number],input[type=tel],input[type=email]').forEach(i => i.addEventListener('input', actualizarProgreso));
+
+function getRadio(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : ''; }
+function getChecks(name) { return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value).join(', '); }
+function v(id) { return document.getElementById(id)?.value.trim() || ''; }
+
+async function enviarCliente() {
+  const nombre = v('c_nombre');
+  if (!nombre) { alert('Por favor ingrese su nombre completo.'); document.getElementById('c_nombre').focus(); return; }
+  const nss = v('c_nss');
+  if (!nss) { alert('Por favor ingrese su Número de Seguridad Social.'); document.getElementById('c_nss').focus(); return; }
+
+  const datos = {
+    nombre, fnac: v('c_fnac'), edad: v('c_edad'), nss, curp: v('c_curp'),
+    tel: v('c_tel'), correo: v('c_correo'), ocupacion: v('c_ocupacion'),
+    patron: v('c_patron'), sit_lab: v('c_sit_lab'), fecha_alta: v('c_fecha_alta'),
+    semanas: v('c_semanas'), ley73: getRadio('c_ley73'),
+    periodos: getRadio('c_periodos'), periodos_det: v('c_periodos_det'),
+    multipatron: getRadio('c_multipatron'),
+    retiro_desempleo: getRadio('c_retiro_desempleo'),
+    retiro_mat: getRadio('c_retiro_mat'),
+    issste: getRadio('c_issste'), issste_det: v('c_issste_det'),
+    mod40: getRadio('c_mod40'), afore: getRadio('c_afore'),
+    afore_nombre: v('c_afore_nombre'), sar: getRadio('c_sar'),
+    salud: getChecks('c_salud'), conyuge: getRadio('c_conyuge'),
+    hijos_ben: getRadio('c_hijos_ben'), beneficiarios: v('c_beneficiarios'),
+    dependientes: getRadio('c_dependientes'),
+  };
+
+  // Construir URL para pre-llenar Herramienta B
+  const params = new URLSearchParams();
+  Object.entries(datos).forEach(([k, v]) => { if (v) params.set(k, v); });
+  const urlB = 'https://armgallardo-del.github.io/pensiones/index.html?' + params.toString();
+
+  document.getElementById('form-wrap').style.display = 'none';
+  document.getElementById('spinnerWrap').style.display = 'block';
+
+  try {
+    const res = await fetch('https://formspree.io/f/xkoloyob', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: `📱 Nuevo cliente — ${nombre} — NSS ${nss}`,
+        _replyto: datos.correo || 'sin-correo@indicado.com',
+        cliente: nombre, nss, telefono: datos.tel,
+        resumen: `Ley73: ${datos.ley73} | Retiro desempleo: ${datos.retiro_desempleo} | ISSSTE: ${datos.issste} | Mod40: ${datos.mod40} | Semanas aprox: ${datos.semanas}`,
+        link_herramienta_b: urlB,
+        datos_completos: JSON.stringify(datos, null, 2),
+      })
+    });
+    document.getElementById('spinnerWrap').style.display = 'none';
+    if (res.ok) {
+      document.getElementById('successWrap').style.display = 'block';
+    } else { throw new Error(); }
+  } catch {
+    document.getElementById('spinnerWrap').style.display = 'none';
+    document.getElementById('form-wrap').style.display = 'block';
+    document.getElementById('errorWrap').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
