@@ -243,6 +243,32 @@
   .inf-pie-col .inf-linea { border-top: 1.5px solid #444; margin-top: 35px; padding-top: 4px; font-size: 8pt; color: #444; }
 
   /* ── PRINT ── */
+  /* ── PAGE BREAK CONTROLS (pantalla) ── */
+  .inf-sec {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .inf-sec-header {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  .inf-membrete, .inf-titulo-doc, .inf-ficha {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .inf-resumen-grid, .inf-diag-grid {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .inf-pie {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .inf-aviso {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
   @media print {
     body { background: #fff; padding: 0; }
     .action-bar { display: none !important; }
@@ -250,7 +276,13 @@
     .page { display: none !important; }
     #informe-wrapper { display: block !important; }
     .informe-page { box-shadow: none; margin: 0; padding: 10mm 14mm; width: 100%; }
-    @page { margin: 0; size: letter; }
+    @page { margin: 12mm 14mm; size: letter; }
+    .informe-page { padding: 0; }
+    .inf-sec { page-break-inside: avoid; break-inside: avoid; border: 1px solid #ccc !important; margin-bottom: 10px; }
+    .inf-sec-header { page-break-after: avoid; break-after: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .inf-membrete, .inf-titulo-doc, .inf-ficha, .inf-resumen-grid, .inf-diag-grid, .inf-pie, .inf-aviso { page-break-inside: avoid; break-inside: avoid; }
+    .inf-tabla td, .inf-tabla th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
@@ -262,6 +294,7 @@
   <button class="btn btn-informe" onclick="generarInforme()">📄 Generar Informe</button>
   <button class="btn btn-send"    onclick="abrirModal()">📤 Enviar al consultor</button>
   <button class="btn btn-print"   onclick="imprimirInforme()">🖨️ Imprimir Informe</button>
+  <button class="btn" style="background:#7b2fbe;color:#fff;" onclick="abrirModalCliente()" id="btnEnviarCliente">📧 Enviar PDF al cliente</button>
   <button class="btn btn-reset"   onclick="limpiarFormulario()">🔄 Limpiar</button>
 </div>
 
@@ -965,6 +998,27 @@ window.addEventListener('load', () => {
   document.getElementById('fecha').value = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
 });
 </script>
+<!-- MODAL ENVÍO AL CLIENTE -->
+<div class="modal-overlay" id="modalClienteOverlay">
+  <div class="modal" style="max-width:460px;">
+    <h2>📧 Enviar Informe al Cliente</h2>
+    <p>Se enviará un resumen del diagnóstico al correo del cliente. El cliente recibirá los datos principales y la recomendación del consultor.</p>
+    <div style="text-align:left;margin-bottom:10px;">
+      <label style="font-size:8pt;color:#555;font-weight:700;display:block;margin-bottom:4px;">CORREO DEL CLIENTE</label>
+      <input type="email" id="clienteCorreoEnvio" placeholder="correo@ejemplo.com" style="width:100%;border:1.5px solid #aac0de;border-radius:5px;padding:9px 12px;font-size:10pt;font-family:inherit;outline:none;">
+    </div>
+    <div style="text-align:left;margin-bottom:14px;">
+      <label style="font-size:8pt;color:#555;font-weight:700;display:block;margin-bottom:4px;">MENSAJE ADICIONAL (opcional)</label>
+      <textarea id="clienteMensajeExtra" placeholder="Ej: Adjunto encontrará su diagnóstico de pensión. Para cualquier duda estoy a sus órdenes." style="width:100%;border:1.5px solid #aac0de;border-radius:5px;padding:9px 12px;font-size:9pt;font-family:inherit;outline:none;min-height:60px;resize:vertical;"></textarea>
+    </div>
+    <button class="btn btn-send" id="modalClienteBtnSend" onclick="enviarInformeCliente()" style="width:100%;padding:11px;font-size:10pt;margin-bottom:8px;">📤 Enviar al cliente</button>
+    <div class="spinner" id="spinnerCliente" style="display:none;margin:12px auto;width:28px;height:28px;border:3px solid #dde;border-top-color:#7b2fbe;border-radius:50%;animation:spin .8s linear infinite;"></div>
+    <div id="successCliente" style="display:none;color:#1a7a4a;font-size:11pt;font-weight:700;margin:10px 0;">✅ ¡Informe enviado al cliente!</div>
+    <div id="errorCliente" style="display:none;color:#8c2020;font-size:9pt;margin:8px 0;">❌ Error al enviar. Verifique la conexión.</div>
+    <button class="btn-cancel-m" id="modalClienteBtnCancel" onclick="cerrarModalCliente()" style="width:100%;padding:9px;background:#eee;color:#555;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:9pt;margin-top:4px;">Cancelar</button>
+  </div>
+</div>
+
 </body>
 </html>
 <script>
