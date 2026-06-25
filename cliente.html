@@ -171,6 +171,7 @@
 
   /* PIE */
   .pie { text-align: center; padding: 24px 20px 10px; font-size: 12px; color: #999; line-height: 1.6; }
+  .req { color: #c0392b; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -188,7 +189,8 @@
   </div>
 
   <div class="info-box" style="margin: 14px 14px 0;">
-    Por favor llene este formulario con sus datos. La información es confidencial y será utilizada únicamente para elaborar su diagnóstico de pensión.
+    Por favor llene este formulario con sus datos. La información es confidencial y será utilizada únicamente para elaborar su diagnóstico de pensión.<br>
+    <span style="margin-top:6px;display:inline-block;"><span class="req">*</span> Campos obligatorios: nombre, fecha de nacimiento, NSS, CURP, teléfono y correo electrónico.</span>
   </div>
 
   <!-- SECCIÓN 1: DATOS PERSONALES -->
@@ -196,11 +198,11 @@
     <div class="card-header">👤 1. Datos Personales</div>
     <div class="card-body">
       <div class="field">
-        <label>Nombre completo *</label>
+        <label>Nombre completo <span class="req">*</span></label>
         <input type="text" id="c_nombre" placeholder="Apellidos y nombre(s)" autocomplete="name">
       </div>
       <div class="field">
-        <label>Fecha de nacimiento *</label>
+        <label>Fecha de nacimiento <span class="req">*</span></label>
         <input type="text" id="c_fnac" placeholder="DD/MM/AAAA">
       </div>
       <div class="field">
@@ -208,20 +210,20 @@
         <input type="number" id="c_edad" placeholder="Años cumplidos" min="18" max="90">
       </div>
       <div class="field">
-        <label>Número de Seguridad Social (NSS) *</label>
+        <label>Número de Seguridad Social (NSS) <span class="req">*</span></label>
         <div class="hint">Lo encuentra en su credencial del IMSS o en su estado de cuenta Afore.</div>
         <input type="text" id="c_nss" placeholder="11 dígitos" maxlength="11" inputmode="numeric">
       </div>
       <div class="field">
-        <label>CURP</label>
+        <label>CURP <span class="req">*</span></label>
         <input type="text" id="c_curp" placeholder="18 caracteres" maxlength="18" style="text-transform:uppercase;">
       </div>
       <div class="field">
-        <label>Teléfono / WhatsApp *</label>
+        <label>Teléfono / WhatsApp <span class="req">*</span></label>
         <input type="tel" id="c_tel" placeholder="10 dígitos" inputmode="numeric">
       </div>
       <div class="field">
-        <label>Correo electrónico</label>
+        <label>Correo electrónico <span class="req">*</span></label>
         <input type="email" id="c_correo" placeholder="ejemplo@correo.com" inputmode="email">
       </div>
       <div class="field">
@@ -455,6 +457,8 @@
   <div class="success-icon">✅</div>
   <h2>¡Información enviada correctamente!</h2>
   <p>El C.P. Armando Gallardo Terán ha recibido sus datos y se pondrá en contacto con usted para continuar con su diagnóstico de pensión.</p>
+  <p style="margin-top:12px;font-size:14px;color:#1a4e8c;font-weight:600;">Folio de seguimiento: <span id="folioMostrado" style="background:#eef3ff;padding:3px 10px;border-radius:6px;letter-spacing:1px;"></span></p>
+  <p style="margin-top:8px;font-size:13px;color:#888;">Guarde este folio — lo necesitará para dar seguimiento a su caso.</p>
   <p style="margin-top:14px;font-size:13px;color:#888;">Consultoría de Pensiones · Aguascalientes</p>
 </div>
 
@@ -508,15 +512,34 @@ function getRadio(name) { const el = document.querySelector(`input[name="${name}
 function getChecks(name) { return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value).join(', '); }
 function v(id) { return document.getElementById(id)?.value.trim() || ''; }
 
+function generarFolio() {
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const rand = String(Math.floor(Math.random() * 9000) + 1000);
+  return `CP${yy}${mm}${dd}-${rand}`;
+}
+
 async function enviarCliente() {
   const nombre = v('c_nombre');
   if (!nombre) { alert('Por favor ingrese su nombre completo.'); document.getElementById('c_nombre').focus(); return; }
+  const fnac = v('c_fnac');
+  if (!fnac) { alert('Por favor ingrese su fecha de nacimiento.'); document.getElementById('c_fnac').focus(); return; }
   const nss = v('c_nss');
   if (!nss) { alert('Por favor ingrese su Número de Seguridad Social.'); document.getElementById('c_nss').focus(); return; }
+  const curp = v('c_curp');
+  if (!curp) { alert('Por favor ingrese su CURP.'); document.getElementById('c_curp').focus(); return; }
+  const tel = v('c_tel');
+  if (!tel) { alert('Por favor ingrese su teléfono / WhatsApp.'); document.getElementById('c_tel').focus(); return; }
+  const correo = v('c_correo');
+  if (!correo || !correo.includes('@')) { alert('Por favor ingrese un correo electrónico válido.'); document.getElementById('c_correo').focus(); return; }
+
+  const folio = generarFolio();
 
   const datos = {
-    nombre, fnac: v('c_fnac'), edad: v('c_edad'), nss, curp: v('c_curp'),
-    tel: v('c_tel'), correo: v('c_correo'), ocupacion: v('c_ocupacion'),
+    folio, nombre, fnac, edad: v('c_edad'), nss, curp,
+    tel, correo, ocupacion: v('c_ocupacion'),
     patron: v('c_patron'), sit_lab: v('c_sit_lab'), fecha_alta: v('c_fecha_alta'),
     semanas: v('c_semanas'), ley73: getRadio('c_ley73'),
     periodos: getRadio('c_periodos'), periodos_det: v('c_periodos_det'),
@@ -533,7 +556,7 @@ async function enviarCliente() {
 
   // Construir URL para pre-llenar Herramienta B
   const params = new URLSearchParams();
-  Object.entries(datos).forEach(([k, v]) => { if (v) params.set(k, v); });
+  Object.entries(datos).forEach(([k, val]) => { if (val) params.set(k, val); });
   const urlB = 'https://armgallardo-del.github.io/pensiones/index.html?' + params.toString();
 
   document.getElementById('form-wrap').style.display = 'none';
@@ -544,9 +567,9 @@ async function enviarCliente() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({
-        _subject: `📱 Nuevo cliente — ${nombre} — NSS ${nss}`,
+        _subject: `📱 Nuevo cliente — ${nombre} — NSS ${nss} — Folio ${folio}`,
         _replyto: datos.correo || 'sin-correo@indicado.com',
-        cliente: nombre, nss, telefono: datos.tel,
+        folio, cliente: nombre, nss, telefono: datos.tel, correo: datos.correo,
         resumen: `Ley73: ${datos.ley73} | Retiro desempleo: ${datos.retiro_desempleo} | ISSSTE: ${datos.issste} | Mod40: ${datos.mod40} | Semanas aprox: ${datos.semanas}`,
         link_herramienta_b: urlB,
         datos_completos: JSON.stringify(datos, null, 2),
@@ -554,6 +577,7 @@ async function enviarCliente() {
     });
     document.getElementById('spinnerWrap').style.display = 'none';
     if (res.ok) {
+      document.getElementById('folioMostrado').textContent = folio;
       document.getElementById('successWrap').style.display = 'block';
     } else { throw new Error(); }
   } catch {
