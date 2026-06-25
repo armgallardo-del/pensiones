@@ -325,7 +325,7 @@
     </div>
     <div class="header-right">
       <div class="badge">SESIÓN INICIAL</div>
-      <div class="folio-box">Folio: <input type="text" id="folio" placeholder="Auto" style="width:110px;border:none;border-bottom:1px solid #aaa;font-size:8pt;outline:none;font-weight:700;color:#1a4e8c;letter-spacing:.5px;"></div>
+      <div class="folio-box">Folio: <input type="text" id="folio" placeholder="001" style="width:55px;border:none;border-bottom:1px solid #aaa;font-size:8pt;outline:none;"></div>
       <div class="folio-box" style="margin-top:3px;">Fecha: <input type="text" id="fecha" placeholder="DD/MM/AAAA" style="width:80px;border:none;border-bottom:1px solid #aaa;font-size:8pt;outline:none;"></div>
     </div>
   </div>
@@ -722,113 +722,7 @@
 </div><!-- /informe-wrapper -->
 
 <script>
-// ─── MODAL CLIENTE ───────────────────────────────────────────────────────────
-function abrirModalCliente() {
-  // Pre-llenar correo del cliente si existe
-  const correoCliente = val('correo');
-  document.getElementById('clienteCorreoEnvio').value = correoCliente !== '—' ? correoCliente : '';
-  document.getElementById('successCliente').style.display = 'none';
-  document.getElementById('errorCliente').style.display = 'none';
-  document.getElementById('spinnerCliente').style.display = 'none';
-  document.getElementById('modalClienteBtnSend').style.display = 'block';
-  document.getElementById('modalClienteBtnCancel').style.display = 'block';
-  document.getElementById('modalClienteOverlay').classList.add('active');
-}
-
-function cerrarModalCliente() {
-  document.getElementById('modalClienteOverlay').classList.remove('active');
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const overlay = document.getElementById('modalClienteOverlay');
-  if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) cerrarModalCliente(); });
-});
-
-async function enviarInformeCliente() {
-  const correo = document.getElementById('clienteCorreoEnvio').value.trim();
-  if (!correo || !correo.includes('@')) {
-    alert('Por favor ingrese un correo electrónico válido del cliente.');
-    document.getElementById('clienteCorreoEnvio').focus();
-    return;
-  }
-  const d = recolectarDatos();
-  const mensajeExtra = document.getElementById('clienteMensajeExtra').value.trim();
-
-  document.getElementById('modalClienteBtnSend').style.display = 'none';
-  document.getElementById('modalClienteBtnCancel').style.display = 'none';
-  document.getElementById('spinnerCliente').style.display = 'block';
-  document.getElementById('successCliente').style.display = 'none';
-  document.getElementById('errorCliente').style.display = 'none';
-
-  // Construir resumen para el cliente
-  const pension = d.pension_total !== '—' ? d.pension_total : (d.pl73 !== '—' ? d.pl73 : 'Por determinar');
-  const ley = d.leyconv !== '—' ? d.leyconv : d.ley73;
-  const edadJub = d.edad_jub !== '—' ? d.edad_jub : 'Por determinar';
-  const semanasTotal = d.res_total !== '—' ? d.res_total : (d.semanas !== '—' ? d.semanas : 'Por determinar');
-
-  const resumenCliente = `DIAGNÓSTICO DE PENSIÓN IMSS
-Consultoría de Pensiones · Aguascalientes
-C.P. Armando Gallardo Terán · armgallardo@gmail.com
-
-Cliente: ${d.nombre}
-Folio: ${d.folio}
-Fecha: ${d.fecha}
-NSS: ${d.nss}
-
-RESUMEN DEL DIAGNÓSTICO:
-• Ley aplicable más conveniente: ${ley}
-• Semanas totales proyectadas: ${semanasTotal}
-• Pensión mensual estimada: ${pension}
-• Edad recomendada para jubilarse: ${edadJub}
-
-PRÓXIMOS PASOS:
-${d.pasos !== '—' ? d.pasos.split(', ').map((p,i) => `${i+1}. ${p}`).join('\n') : 'Pendiente de definir'}
-
-${mensajeExtra ? `MENSAJE DEL CONSULTOR:\n${mensajeExtra}` : ''}
-
----
-Este diagnóstico es de carácter informativo. Los montos son estimaciones sujetas a la resolución oficial del IMSS.
-Consultoría de Pensiones IMSS · Aguascalientes, México`;
-
-  try {
-    const res = await fetch('https://formspree.io/f/xkoloyob', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        _subject: `📄 Su Diagnóstico de Pensión IMSS — Folio ${d.folio}`,
-        _replyto: 'armgallardo@gmail.com',
-        email: correo,
-        Destinatario: correo,
-        Cliente: d.nombre,
-        Folio: d.folio,
-        Diagnostico_completo: resumenCliente,
-        Pension_estimada: pension,
-        Ley_recomendada: ley,
-        Semanas_proyectadas: semanasTotal,
-        Edad_jubilacion: edadJub,
-        Mensaje_consultor: mensajeExtra || 'Sin mensaje adicional',
-      }),
-    });
-    document.getElementById('spinnerCliente').style.display = 'none';
-    if (res.ok) {
-      document.getElementById('successCliente').style.display = 'block';
-      document.getElementById('modalClienteBtnCancel').textContent = 'Cerrar';
-      document.getElementById('modalClienteBtnCancel').style.display = 'block';
-    } else {
-      const errData = await res.json().catch(() => ({}));
-      console.error('Formspree error (cliente):', errData);
-      throw new Error('Respuesta no OK');
-    }
-  } catch(e) {
-    console.error(e);
-    document.getElementById('spinnerCliente').style.display = 'none';
-    document.getElementById('errorCliente').style.display = 'block';
-    document.getElementById('modalClienteBtnSend').style.display = 'block';
-    document.getElementById('modalClienteBtnCancel').style.display = 'block';
-  }
-}
-
-
+// ─── UTILIDADES ──────────────────────────────────────────────────────────────
 function getRadio(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : '—'; }
 function getCheckboxes(name) { return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value); }
 function val(id) { const el = document.getElementById(id); return el ? (el.value.trim() || '—') : '—'; }
@@ -1063,52 +957,33 @@ async function enviarFormulario() {
   document.getElementById('modalBtnSend').style.display = 'none';
   document.getElementById('modalBtnCancel').style.display = 'none';
   document.getElementById('spinner').style.display = 'block';
-  document.getElementById('successMsg').style.display = 'none';
-  document.getElementById('errorMsg').style.display = 'none';
   try {
-    const payload = {
-      _subject: `📋 Diagnóstico IMSS — ${nombreConfirm} — Folio ${d.folio}`,
-      Folio: d.folio,
-      Fecha: d.fecha,
-      Cliente: nombreConfirm,
-      NSS: d.nss,
-      Telefono: d.tel,
-      Correo: d.correo !== '—' ? d.correo : '',
-      Semanas_constancia: d.semanas,
-      Ley_aplicable: d.ley73,
-      Pension_Ley73: d.pl73,
-      Pension_Ley97: d.pl97,
-      Pension_total: d.pension_total,
-      Edad_jubilacion: d.edad_jub,
-      Semanas_resumen: `IMSS:${d.res_imss} | ISSSTE:${d.res_issste} | Desc:${d.res_desc} | Netas:${d.res_netas} | Total_proy:${d.res_total}`,
-      Pasos_siguientes: d.pasos,
-      Observaciones: d.obs,
-    };
-    if (d.correo && d.correo !== '—') payload._replyto = d.correo;
-
     const res = await fetch('https://formspree.io/f/xkoloyob', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        _subject: `📋 Diagnóstico IMSS — ${nombreConfirm} — Folio ${d.folio}`,
+        _replyto: d.correo !== '—' ? d.correo : 'sin-correo@indicado.com',
+        cliente: nombreConfirm, folio: d.folio, fecha: d.fecha,
+        semanas_constancia: d.semanas, ley: d.ley73, pension_l73: d.pl73,
+        pension_l97: d.pl97, pension_total: d.pension_total,
+        edad_jubilarse: d.edad_jub, pasos_siguientes: d.pasos, observaciones: d.obs,
+        resumen_semanas: `IMSS:${d.res_imss} | ISSSTE:${d.res_issste} | Desc:${d.res_desc} | Netas:${d.res_netas} | Total proy:${d.res_total}`,
+      })
     });
     document.getElementById('spinner').style.display = 'none';
     if (res.ok) {
       document.getElementById('successMsg').style.display = 'block';
-      document.getElementById('modalBtnCancel').textContent = 'Cerrar';
-      document.getElementById('modalBtnCancel').style.display = 'block';
-    } else {
-      const errData = await res.json().catch(() => ({}));
-      console.error('Formspree error:', errData);
-      throw new Error('Respuesta no OK');
-    }
-  } catch(e) {
-    console.error(e);
+      setTimeout(() => cerrarModal(), 2500);
+    } else { throw new Error(); }
+  } catch {
     document.getElementById('spinner').style.display = 'none';
     document.getElementById('errorMsg').style.display = 'block';
     document.getElementById('modalBtnSend').style.display = 'block';
     document.getElementById('modalBtnCancel').style.display = 'block';
   }
 }
+
 
 function limpiarFormulario() {
   if (!confirm('¿Limpiar todos los campos?')) return;
@@ -1122,10 +997,9 @@ function limpiarFormulario() {
 window.addEventListener('load', () => {
   const hoy = new Date();
   document.getElementById('fecha').value = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
-
-  // Generar folio si no viene por URL
-  const p = new URLSearchParams(window.location.search);
-  const folioURL = p.get('folio');
+  // Folio automático
+  const p2 = new URLSearchParams(window.location.search);
+  const folioURL = p2.get('folio');
   if (folioURL) {
     document.getElementById('folio').value = folioURL;
   } else {
@@ -1137,11 +1011,12 @@ window.addEventListener('load', () => {
   }
 });
 </script>
+
 <!-- MODAL ENVÍO AL CLIENTE -->
 <div class="modal-overlay" id="modalClienteOverlay">
   <div class="modal" style="max-width:460px;">
     <h2>📧 Enviar Informe al Cliente</h2>
-    <p>Se enviará un resumen del diagnóstico al correo del cliente. El cliente recibirá los datos principales y la recomendación del consultor.</p>
+    <p>Se enviará el resumen del diagnóstico directamente al correo del cliente.</p>
     <div style="text-align:left;margin-bottom:10px;">
       <label style="font-size:8pt;color:#555;font-weight:700;display:block;margin-bottom:4px;">CORREO DEL CLIENTE</label>
       <input type="email" id="clienteCorreoEnvio" placeholder="correo@ejemplo.com" style="width:100%;border:1.5px solid #aac0de;border-radius:5px;padding:9px 12px;font-size:10pt;font-family:inherit;outline:none;">
@@ -1153,18 +1028,113 @@ window.addEventListener('load', () => {
     <button class="btn btn-send" id="modalClienteBtnSend" onclick="enviarInformeCliente()" style="width:100%;padding:11px;font-size:10pt;margin-bottom:8px;">📤 Enviar al cliente</button>
     <div class="spinner" id="spinnerCliente" style="display:none;margin:12px auto;width:28px;height:28px;border:3px solid #dde;border-top-color:#7b2fbe;border-radius:50%;animation:spin .8s linear infinite;"></div>
     <div id="successCliente" style="display:none;color:#1a7a4a;font-size:11pt;font-weight:700;margin:10px 0;">✅ ¡Informe enviado al cliente!</div>
-    <div id="errorCliente" style="display:none;color:#8c2020;font-size:9pt;margin:8px 0;">❌ Error al enviar. Verifique la conexión.</div>
+    <div id="errorCliente" style="display:none;color:#8c2020;font-size:9pt;margin:8px 0;line-height:1.5;"></div>
     <button class="btn-cancel-m" id="modalClienteBtnCancel" onclick="cerrarModalCliente()" style="width:100%;padding:9px;background:#eee;color:#555;border:none;border-radius:6px;cursor:pointer;font-family:inherit;font-size:9pt;margin-top:4px;">Cancelar</button>
   </div>
 </div>
 
 </body>
 </html>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
+// ════════════════════════════════════════════════════════
+// EmailJS — configuración (reemplaza las 3 constantes)
+// 1. Crea cuenta en https://www.emailjs.com (gratis)
+// 2. Crea un Email Service (Gmail recomendado) → copia el Service ID
+// 3. Crea un Email Template → copia el Template ID
+//    Variables del template: {{to_name}}, {{folio}}, {{fecha}}, {{nss}},
+//    {{ley_recomendada}}, {{semanas_total}}, {{pension_estimada}},
+//    {{edad_jubilacion}}, {{pasos_siguientes}}, {{mensaje_extra}}, {{from_name}}
+// 4. Copia tu Public Key desde Account → General
+// ════════════════════════════════════════════════════════
+const EMAILJS_PUBLIC_KEY  = 'dxC2hr_eNO1oqh1D7';
+const EMAILJS_SERVICE_ID  = 'service_tulg17w';
+const EMAILJS_TEMPLATE_ID = 'template_272cs0s';
+
+(function() { emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); })();
+
+// ─── MODAL CLIENTE ────────────────────────────────────────────────────────────
+function abrirModalCliente() {
+  const correoCliente = val('correo');
+  document.getElementById('clienteCorreoEnvio').value = correoCliente !== '—' ? correoCliente : '';
+  document.getElementById('successCliente').style.display = 'none';
+  document.getElementById('errorCliente').style.display = 'none';
+  document.getElementById('spinnerCliente').style.display = 'none';
+  document.getElementById('modalClienteBtnSend').style.display = 'block';
+  document.getElementById('modalClienteBtnCancel').style.display = 'block';
+  document.getElementById('modalClienteBtnCancel').textContent = 'Cancelar';
+  document.getElementById('modalClienteOverlay').classList.add('active');
+}
+
+function cerrarModalCliente() {
+  document.getElementById('modalClienteOverlay').classList.remove('active');
+}
+
+document.getElementById('modalClienteOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalClienteOverlay')) cerrarModalCliente();
+});
+
+async function enviarInformeCliente() {
+  const correo = document.getElementById('clienteCorreoEnvio').value.trim();
+  if (!correo || !correo.includes('@')) {
+    alert('Por favor ingrese un correo electrónico válido del cliente.');
+    document.getElementById('clienteCorreoEnvio').focus();
+    return;
+  }
+  const d = recolectarDatos();
+  const mensajeExtra = document.getElementById('clienteMensajeExtra').value.trim();
+
+  document.getElementById('modalClienteBtnSend').style.display = 'none';
+  document.getElementById('modalClienteBtnCancel').style.display = 'none';
+  document.getElementById('spinnerCliente').style.display = 'block';
+  document.getElementById('successCliente').style.display = 'none';
+  document.getElementById('errorCliente').style.display = 'none';
+
+  const pension   = d.pension_total !== '—' ? d.pension_total : (d.pl73 !== '—' ? d.pl73 : 'Por determinar');
+  const ley       = d.leyconv !== '—' ? d.leyconv : (d.ley73 !== '—' ? d.ley73 : 'Por determinar');
+  const edadJub   = d.edad_jub !== '—' ? d.edad_jub : 'Por determinar';
+  const semTot    = d.res_total !== '—' ? d.res_total : (d.semanas !== '—' ? d.semanas : 'Por determinar');
+  const pasosList = d.pasos !== '—'
+    ? d.pasos.split(', ').map((p,i) => `${i+1}. ${p}`).join('\n')
+    : 'Pendiente de definir';
+
+  const templateParams = {
+    to_email:         correo,
+    to_name:          d.nombre !== '—' ? d.nombre : 'Estimado cliente',
+    folio:            d.folio,
+    fecha:            d.fecha,
+    nss:              d.nss !== '—' ? d.nss : '',
+    ley_recomendada:  ley,
+    semanas_total:    semTot,
+    pension_estimada: pension,
+    edad_jubilacion:  edadJub,
+    pasos_siguientes: pasosList,
+    mensaje_extra:    mensajeExtra || 'Para cualquier duda o aclaración, estoy a sus órdenes.',
+    from_name:        'C.P. Armando Gallardo Terán — Consultoría de Pensiones',
+    reply_to:         'armgallardo@gmail.com',
+  };
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
+    document.getElementById('spinnerCliente').style.display = 'none';
+    document.getElementById('successCliente').style.display = 'block';
+    document.getElementById('modalClienteBtnCancel').textContent = 'Cerrar';
+    document.getElementById('modalClienteBtnCancel').style.display = 'block';
+  } catch(err) {
+    console.error('EmailJS error:', err);
+    document.getElementById('spinnerCliente').style.display = 'none';
+    const errEl = document.getElementById('errorCliente');
+    errEl.innerHTML = `❌ Error al enviar.<br><small style="color:#999;">Verifica que Public Key, Service ID y Template ID de EmailJS sean correctos.<br>Detalle: ${err.text || err.message || JSON.stringify(err)}</small>`;
+    errEl.style.display = 'block';
+    document.getElementById('modalClienteBtnSend').style.display = 'block';
+    document.getElementById('modalClienteBtnCancel').style.display = 'block';
+  }
+}
+
 // ─── AUTO-LLENAR DESDE URL (datos del cliente vía Herramienta A) ──────────────
 window.addEventListener('load', () => {
   const p = new URLSearchParams(window.location.search);
-  if (!p.has('nombre')) return; // No hay datos en URL
+  if (!p.has('nombre')) return;
 
   const map = {
     nombre:'nombre', fnac:'fnac', edad:'edad', nss:'nss', curp:'curp',
@@ -1178,40 +1148,36 @@ window.addEventListener('load', () => {
     if (el && p.get(param)) el.value = decodeURIComponent(p.get(param));
   });
 
-  // Selects
   if (p.get('sit_lab')) {
     const sel = document.getElementById('situacion_laboral');
     if (sel) [...sel.options].forEach(o => { if (o.value === p.get('sit_lab')) o.selected = true; });
   }
 
-  // Radios
   const radioMap = {
-    ley73:      { name:'ley73',      values:{'Sí (Ley 73)':'Sí (Ley 73)','No (Ley 97)':'No (Ley 97)'} },
-    multipatron:{ name:'multipatron',values:{'Sí':'Sí','No':'No'} },
-    periodos:   { name:'conserva',   values:{'Sí':'Sí','No':'No'} },
-    issste:     { name:'c1',         values:{'Sí':'Sí','No':'No'} },
-    retiro_desempleo: { name:'b1',   values:{'Sí':'Sí','No':'No'} },
-    retiro_mat: { name:'b2',         values:{'Sí':'Sí','No':'No'} },
-    sar:        { name:'f1',         values:{'Sí':'Sí','No':'No','No sé':'Desconoce'} },
-    mod40:      { name:'d1',         values:{'Sí':'Sí','No':'No'} },
-    conyuge:    { name:'ay1',        values:{'Sí':'Aplica','No':'No aplica'} },
-    dependientes:{ name:'herencia',  values:{'Sí':'Sí','No':'No'} },
+    ley73:       { name:'ley73',       values:{'Sí (Ley 73)':'Sí (Ley 73)','No (Ley 97)':'No (Ley 97)'} },
+    multipatron: { name:'multipatron', values:{'Sí':'Sí','No':'No'} },
+    periodos:    { name:'conserva',    values:{'Sí':'Sí','No':'No'} },
+    issste:      { name:'c1',          values:{'Sí':'Sí','No':'No'} },
+    retiro_desempleo: { name:'b1',     values:{'Sí':'Sí','No':'No'} },
+    retiro_mat:  { name:'b2',          values:{'Sí':'Sí','No':'No'} },
+    sar:         { name:'f1',          values:{'Sí':'Sí','No':'No','No sé':'Desconoce'} },
+    mod40:       { name:'d1',          values:{'Sí':'Sí','No':'No'} },
+    conyuge:     { name:'ay1',         values:{'Sí':'Aplica','No':'No aplica'} },
+    dependientes:{ name:'herencia',    values:{'Sí':'Sí','No':'No'} },
   };
   Object.entries(radioMap).forEach(([param, cfg]) => {
-    const val = p.get(param);
-    if (!val) return;
-    const mapped = cfg.values[val] || val;
+    const v2 = p.get(param);
+    if (!v2) return;
+    const mapped = cfg.values[v2] || v2;
     const radio = document.querySelector(`input[name="${cfg.name}"][value="${mapped}"]`);
     if (radio) radio.checked = true;
   });
 
-  // Beneficiarios
   if (p.get('beneficiarios')) {
     const el = document.getElementById('beneficiarios');
     if (el) el.value = decodeURIComponent(p.get('beneficiarios'));
   }
 
-  // Aviso visual
   const aviso = document.createElement('div');
   aviso.style.cssText = 'background:#e8f5ed;border:2px solid #1a7a4a;border-radius:8px;padding:12px 16px;margin:0 0 10px;font-size:8.5pt;color:#1a4e8c;width:215.9mm;margin-left:auto;margin-right:auto;';
   aviso.innerHTML = '✅ <strong>Datos del cliente cargados automáticamente.</strong> Revise y complete los campos técnicos para generar el informe.';
