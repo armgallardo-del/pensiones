@@ -325,7 +325,7 @@
     </div>
     <div class="header-right">
       <div class="badge">SESIÓN INICIAL</div>
-      <div class="folio-box">Folio: <input type="text" id="folio" placeholder="001" style="width:55px;border:none;border-bottom:1px solid #aaa;font-size:8pt;outline:none;"></div>
+      <div class="folio-box">Folio: <input type="text" id="folio" placeholder="Auto" style="width:110px;border:none;border-bottom:1px solid #aaa;font-size:8pt;outline:none;font-weight:700;color:#1a4e8c;letter-spacing:.5px;"></div>
       <div class="folio-box" style="margin-top:3px;">Fecha: <input type="text" id="fecha" placeholder="DD/MM/AAAA" style="width:80px;border:none;border-bottom:1px solid #aaa;font-size:8pt;outline:none;"></div>
     </div>
   </div>
@@ -722,7 +722,113 @@
 </div><!-- /informe-wrapper -->
 
 <script>
-// ─── UTILIDADES ──────────────────────────────────────────────────────────────
+// ─── MODAL CLIENTE ───────────────────────────────────────────────────────────
+function abrirModalCliente() {
+  // Pre-llenar correo del cliente si existe
+  const correoCliente = val('correo');
+  document.getElementById('clienteCorreoEnvio').value = correoCliente !== '—' ? correoCliente : '';
+  document.getElementById('successCliente').style.display = 'none';
+  document.getElementById('errorCliente').style.display = 'none';
+  document.getElementById('spinnerCliente').style.display = 'none';
+  document.getElementById('modalClienteBtnSend').style.display = 'block';
+  document.getElementById('modalClienteBtnCancel').style.display = 'block';
+  document.getElementById('modalClienteOverlay').classList.add('active');
+}
+
+function cerrarModalCliente() {
+  document.getElementById('modalClienteOverlay').classList.remove('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const overlay = document.getElementById('modalClienteOverlay');
+  if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) cerrarModalCliente(); });
+});
+
+async function enviarInformeCliente() {
+  const correo = document.getElementById('clienteCorreoEnvio').value.trim();
+  if (!correo || !correo.includes('@')) {
+    alert('Por favor ingrese un correo electrónico válido del cliente.');
+    document.getElementById('clienteCorreoEnvio').focus();
+    return;
+  }
+  const d = recolectarDatos();
+  const mensajeExtra = document.getElementById('clienteMensajeExtra').value.trim();
+
+  document.getElementById('modalClienteBtnSend').style.display = 'none';
+  document.getElementById('modalClienteBtnCancel').style.display = 'none';
+  document.getElementById('spinnerCliente').style.display = 'block';
+  document.getElementById('successCliente').style.display = 'none';
+  document.getElementById('errorCliente').style.display = 'none';
+
+  // Construir resumen para el cliente
+  const pension = d.pension_total !== '—' ? d.pension_total : (d.pl73 !== '—' ? d.pl73 : 'Por determinar');
+  const ley = d.leyconv !== '—' ? d.leyconv : d.ley73;
+  const edadJub = d.edad_jub !== '—' ? d.edad_jub : 'Por determinar';
+  const semanasTotal = d.res_total !== '—' ? d.res_total : (d.semanas !== '—' ? d.semanas : 'Por determinar');
+
+  const resumenCliente = `DIAGNÓSTICO DE PENSIÓN IMSS
+Consultoría de Pensiones · Aguascalientes
+C.P. Armando Gallardo Terán · armgallardo@gmail.com
+
+Cliente: ${d.nombre}
+Folio: ${d.folio}
+Fecha: ${d.fecha}
+NSS: ${d.nss}
+
+RESUMEN DEL DIAGNÓSTICO:
+• Ley aplicable más conveniente: ${ley}
+• Semanas totales proyectadas: ${semanasTotal}
+• Pensión mensual estimada: ${pension}
+• Edad recomendada para jubilarse: ${edadJub}
+
+PRÓXIMOS PASOS:
+${d.pasos !== '—' ? d.pasos.split(', ').map((p,i) => `${i+1}. ${p}`).join('\n') : 'Pendiente de definir'}
+
+${mensajeExtra ? `MENSAJE DEL CONSULTOR:\n${mensajeExtra}` : ''}
+
+---
+Este diagnóstico es de carácter informativo. Los montos son estimaciones sujetas a la resolución oficial del IMSS.
+Consultoría de Pensiones IMSS · Aguascalientes, México`;
+
+  try {
+    const res = await fetch('https://formspree.io/f/xkoloyob', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: `📄 Su Diagnóstico de Pensión IMSS — Folio ${d.folio}`,
+        _replyto: 'armgallardo@gmail.com',
+        email: correo,
+        Destinatario: correo,
+        Cliente: d.nombre,
+        Folio: d.folio,
+        Diagnostico_completo: resumenCliente,
+        Pension_estimada: pension,
+        Ley_recomendada: ley,
+        Semanas_proyectadas: semanasTotal,
+        Edad_jubilacion: edadJub,
+        Mensaje_consultor: mensajeExtra || 'Sin mensaje adicional',
+      }),
+    });
+    document.getElementById('spinnerCliente').style.display = 'none';
+    if (res.ok) {
+      document.getElementById('successCliente').style.display = 'block';
+      document.getElementById('modalClienteBtnCancel').textContent = 'Cerrar';
+      document.getElementById('modalClienteBtnCancel').style.display = 'block';
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      console.error('Formspree error (cliente):', errData);
+      throw new Error('Respuesta no OK');
+    }
+  } catch(e) {
+    console.error(e);
+    document.getElementById('spinnerCliente').style.display = 'none';
+    document.getElementById('errorCliente').style.display = 'block';
+    document.getElementById('modalClienteBtnSend').style.display = 'block';
+    document.getElementById('modalClienteBtnCancel').style.display = 'block';
+  }
+}
+
+
 function getRadio(name) { const el = document.querySelector(`input[name="${name}"]:checked`); return el ? el.value : '—'; }
 function getCheckboxes(name) { return [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(e => e.value); }
 function val(id) { const el = document.getElementById(id); return el ? (el.value.trim() || '—') : '—'; }
@@ -957,26 +1063,46 @@ async function enviarFormulario() {
   document.getElementById('modalBtnSend').style.display = 'none';
   document.getElementById('modalBtnCancel').style.display = 'none';
   document.getElementById('spinner').style.display = 'block';
+  document.getElementById('successMsg').style.display = 'none';
+  document.getElementById('errorMsg').style.display = 'none';
   try {
+    const payload = {
+      _subject: `📋 Diagnóstico IMSS — ${nombreConfirm} — Folio ${d.folio}`,
+      Folio: d.folio,
+      Fecha: d.fecha,
+      Cliente: nombreConfirm,
+      NSS: d.nss,
+      Telefono: d.tel,
+      Correo: d.correo !== '—' ? d.correo : '',
+      Semanas_constancia: d.semanas,
+      Ley_aplicable: d.ley73,
+      Pension_Ley73: d.pl73,
+      Pension_Ley97: d.pl97,
+      Pension_total: d.pension_total,
+      Edad_jubilacion: d.edad_jub,
+      Semanas_resumen: `IMSS:${d.res_imss} | ISSSTE:${d.res_issste} | Desc:${d.res_desc} | Netas:${d.res_netas} | Total_proy:${d.res_total}`,
+      Pasos_siguientes: d.pasos,
+      Observaciones: d.obs,
+    };
+    if (d.correo && d.correo !== '—') payload._replyto = d.correo;
+
     const res = await fetch('https://formspree.io/f/xkoloyob', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        _subject: `📋 Diagnóstico IMSS — ${nombreConfirm} — Folio ${d.folio}`,
-        _replyto: d.correo !== '—' ? d.correo : 'sin-correo@indicado.com',
-        cliente: nombreConfirm, folio: d.folio, fecha: d.fecha,
-        semanas_constancia: d.semanas, ley: d.ley73, pension_l73: d.pl73,
-        pension_l97: d.pl97, pension_total: d.pension_total,
-        edad_jubilarse: d.edad_jub, pasos_siguientes: d.pasos, observaciones: d.obs,
-        resumen_semanas: `IMSS:${d.res_imss} | ISSSTE:${d.res_issste} | Desc:${d.res_desc} | Netas:${d.res_netas} | Total proy:${d.res_total}`,
-      })
+      body: JSON.stringify(payload),
     });
     document.getElementById('spinner').style.display = 'none';
     if (res.ok) {
       document.getElementById('successMsg').style.display = 'block';
-      setTimeout(() => cerrarModal(), 2500);
-    } else { throw new Error(); }
-  } catch {
+      document.getElementById('modalBtnCancel').textContent = 'Cerrar';
+      document.getElementById('modalBtnCancel').style.display = 'block';
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      console.error('Formspree error:', errData);
+      throw new Error('Respuesta no OK');
+    }
+  } catch(e) {
+    console.error(e);
     document.getElementById('spinner').style.display = 'none';
     document.getElementById('errorMsg').style.display = 'block';
     document.getElementById('modalBtnSend').style.display = 'block';
@@ -996,6 +1122,19 @@ function limpiarFormulario() {
 window.addEventListener('load', () => {
   const hoy = new Date();
   document.getElementById('fecha').value = `${String(hoy.getDate()).padStart(2,'0')}/${String(hoy.getMonth()+1).padStart(2,'0')}/${hoy.getFullYear()}`;
+
+  // Generar folio si no viene por URL
+  const p = new URLSearchParams(window.location.search);
+  const folioURL = p.get('folio');
+  if (folioURL) {
+    document.getElementById('folio').value = folioURL;
+  } else {
+    const yy = String(hoy.getFullYear()).slice(-2);
+    const mm = String(hoy.getMonth()+1).padStart(2,'0');
+    const dd = String(hoy.getDate()).padStart(2,'0');
+    const rand = String(Math.floor(Math.random()*9000)+1000);
+    document.getElementById('folio').value = `CP${yy}${mm}${dd}-${rand}`;
+  }
 });
 </script>
 <!-- MODAL ENVÍO AL CLIENTE -->
@@ -1079,3 +1218,4 @@ window.addEventListener('load', () => {
   document.querySelector('.action-bar').after(aviso);
 });
 </script>
+
